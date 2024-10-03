@@ -1,0 +1,19 @@
+# Ignore build directories
+build/
+
+# Ignore Qt Creator user config files
+*.pro.user
+
+# Ignore auto-generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+
+# Ignore compiled translation files
+*.qm
