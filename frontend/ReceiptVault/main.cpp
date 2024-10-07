@@ -1,10 +1,7 @@
 #include "mainwindow.h"
-
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
-
-// hell
 
 int main(int argc, char *argv[])
 {
