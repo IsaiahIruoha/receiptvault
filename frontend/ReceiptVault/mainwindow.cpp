@@ -19,18 +19,17 @@ using namespace Qt;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    // set the window title
+    // set the window title and size
     setWindowTitle("ReceiptVault - Budget Tracking App");
-    // set the window size
     resize(1000, 600);
 
-    // create a stacked widget to hold different pages
+    // create and set the stacked widget
     stackedWidget = new QStackedWidget(this);
-    // set the stacked widget as the central widget of the main window
     setCentralWidget(stackedWidget);
 
     // initialize all the pages
     setupLoginPage();
+    setupCreateAccountPage(); // Add this line
     setupDashboardPage();
     setupReceiptsPage();
     setupAnalyticsPage();
@@ -38,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // add all the pages to the stacked widget
     stackedWidget->addWidget(loginPage);
+    stackedWidget->addWidget(createAccountPage); // Ensure this is added
     stackedWidget->addWidget(dashboardPage);
     stackedWidget->addWidget(receiptsPage);
     stackedWidget->addWidget(analyticsPage);
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     // display the login page first
     stackedWidget->setCurrentWidget(loginPage);
 
-    // apply the external styles to the application
+    // apply external styles
     applyStyles();
 }
 
@@ -431,7 +431,7 @@ void MainWindow::handleLogin()
     // check if the entered credentials match the hardcoded ones
     if (username == correctUsername && password == correctPassword) {
         // show an information message indicating successful login
-        QMessageBox::information(this, "Success", "Login successful!");
+        // QMessageBox::information(this, "Success", "Login successful!");
         // store the current username
         currentUsername = username;
         // navigate to the dashboard page

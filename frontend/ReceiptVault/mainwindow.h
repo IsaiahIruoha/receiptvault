@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-};
+    ~MainWindow(); // Declare destructor
 
 private slots:
     void handleLogin();
