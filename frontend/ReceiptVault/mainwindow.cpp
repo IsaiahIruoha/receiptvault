@@ -431,7 +431,7 @@ void MainWindow::handleLogin()
     // check if the entered credentials match the hardcoded ones
     if (username == correctUsername && password == correctPassword) {
         // show an information message indicating successful login
-        // QMessageBox::information(this, "Success", "Login successful!");
+        // QMessageBox::information(this, "Success", "Login successful!"); // removed login affirmation
         // store the current username
         currentUsername = username;
         // navigate to the dashboard page
