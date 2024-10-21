@@ -43,6 +43,7 @@ private:
     QPushButton *toCreateAccountButton;
 
     // Create Account Page Widgets
+    QLineEdit *createEmailEdit;
     QLineEdit *createUsernameEdit;
     QLineEdit *createPasswordEdit;
     QLineEdit *createConfirmPasswordEdit;

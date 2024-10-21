@@ -118,6 +118,11 @@ void MainWindow::setupCreateAccountPage()
     // set the object name for styling
     createLabel->setObjectName("titleLabel");
 
+    // create a line edit for the email input
+    createEmailEdit = new QLineEdit(createAccountPage);
+    // set placeholder text for the email input
+    createEmailEdit->setPlaceholderText("Email Address");
+
     // create a line edit for the new username input
     createUsernameEdit = new QLineEdit(createAccountPage);
     // set placeholder text for the username input
@@ -144,6 +149,7 @@ void MainWindow::setupCreateAccountPage()
 
     // add the widgets to the layout
     createLayout->addWidget(createLabel);
+    createLayout->addWidget(createEmailEdit);
     createLayout->addWidget(createUsernameEdit);
     createLayout->addWidget(createPasswordEdit);
     createLayout->addWidget(createConfirmPasswordEdit);
@@ -156,6 +162,7 @@ void MainWindow::setupCreateAccountPage()
     // connect the create account button to a lambda function for handling account creation
     connect(createAccountButton, &QPushButton::clicked, [this]() {
         // get the input from the user
+        QString email = createEmailEdit->text();
         QString username = createUsernameEdit->text();
         QString password = createPasswordEdit->text();
         QString confirmPassword = createConfirmPasswordEdit->text();
@@ -177,6 +184,7 @@ void MainWindow::setupCreateAccountPage()
         // simulate account creation by showing an information message
         QMessageBox::information(this, "Success", "Account created successfully!");
         // clear the input fields after creation
+        createEmailEdit->clear();
         createUsernameEdit->clear();
         createPasswordEdit->clear();
         createConfirmPasswordEdit->clear();
