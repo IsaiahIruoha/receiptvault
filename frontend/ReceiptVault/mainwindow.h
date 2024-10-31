@@ -25,6 +25,9 @@ private slots:
     void navigateToDashboard();
     void navigateToLogin();
 
+    // New slot for handling receipt upload
+    void handleUploadReceipt();
+
 private:
     QStackedWidget *stackedWidget;
 
@@ -59,6 +62,9 @@ private:
     // Receipts Page Widgets
     QTableWidget *receiptsTable;
     QPushButton *backToDashboardButtonReceipts;
+
+    // New Upload Receipt Button
+    QPushButton *uploadReceiptButton;
 
     // Analytics Page Widgets
     QChartView *pieChartView;

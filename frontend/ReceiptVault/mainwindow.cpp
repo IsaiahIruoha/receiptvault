@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QFileDialog> // Include QFileDialog
 #include <QFile>
 #include <QPainter>
 #include <QDebug>
@@ -49,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     // apply external styles
     applyStyles();
 }
+
 
 // destructor for mainwindow class
 MainWindow::~MainWindow()
@@ -260,12 +262,28 @@ void MainWindow::setupReceiptsPage()
     // create a vertical layout for arranging widgets vertically
     QVBoxLayout *receiptsLayout = new QVBoxLayout;
 
+    // Create a horizontal layout for the header (Label and Upload Button)
+    QHBoxLayout *headerLayout = new QHBoxLayout;
+
     // create a label for the receipts title
     QLabel *receiptsLabel = new QLabel("Receipts");
-    // center the label text
-    receiptsLabel->setAlignment(Qt::AlignCenter);
+    // center the label text vertically
+    receiptsLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     // set the object name for styling
     receiptsLabel->setObjectName("titleLabel");
+
+    // create the upload receipt button
+    uploadReceiptButton = new QPushButton("Upload Receipt", receiptsPage);
+    // Optionally, set an icon for the button
+    // uploadReceiptButton->setIcon(QIcon(":/icons/upload.png"));
+
+    // add the label and the button to the header layout
+    headerLayout->addWidget(receiptsLabel);
+    headerLayout->addStretch(); // Push the button to the right
+    headerLayout->addWidget(uploadReceiptButton);
+
+    // add the header layout to the main receipts layout
+    receiptsLayout->addLayout(headerLayout);
 
     // create a table widget to display receipts
     receiptsTable = new QTableWidget(receiptsPage);
@@ -285,8 +303,7 @@ void MainWindow::setupReceiptsPage()
     // create a button to go back to the dashboard
     backToDashboardButtonReceipts = new QPushButton("Back to Dashboard", receiptsPage);
 
-    // add the widgets to the layout
-    receiptsLayout->addWidget(receiptsLabel);
+    // add the table and back button to the main receipts layout
     receiptsLayout->addWidget(receiptsTable);
     receiptsLayout->addWidget(backToDashboardButtonReceipts);
 
@@ -295,6 +312,9 @@ void MainWindow::setupReceiptsPage()
 
     // connect the back to dashboard button to navigate back to the dashboard
     connect(backToDashboardButtonReceipts, &QPushButton::clicked, this, &MainWindow::navigateToDashboard);
+
+    // connect the upload receipt button to the handler
+    connect(uploadReceiptButton, &QPushButton::clicked, this, &MainWindow::handleUploadReceipt);
 
     // populate the receipts table with mock data
     receiptsTable->setRowCount(2); // example with 2 receipts
@@ -308,6 +328,36 @@ void MainWindow::setupReceiptsPage()
     receiptsTable->setItem(1, 0, new QTableWidgetItem("ElectroShop"));
     receiptsTable->setItem(1, 1, new QTableWidgetItem("Headphones"));
     receiptsTable->setItem(1, 2, new QTableWidgetItem("45.00"));
+}
+
+// New slot implementation
+void MainWindow::handleUploadReceipt()
+{
+    // Open a file dialog to select an image file
+    QString fileName = QFileDialog::getOpenFileName(this, "Select Receipt Image", "",
+                                                    "Images (*.png *.xpm *.jpg *.jpeg *.bmp);;All Files (*)");
+    if (!fileName.isEmpty()) {
+        // For now, just display the selected file path in debug
+        qDebug() << "Selected file:" << fileName;
+
+        // Placeholder: In future, integrate OCR processing here
+        // Example: Send the file path to Python OCR module and get the extracted data
+
+        // For demonstration, let's add a mock entry to the receipts table
+        int currentRow = receiptsTable->rowCount();
+        receiptsTable->insertRow(currentRow);
+
+        // Mock data - replace this with actual OCR data
+        receiptsTable->setItem(currentRow, 0, new QTableWidgetItem("New Store"));
+        receiptsTable->setItem(currentRow, 1, new QTableWidgetItem("Item1, Item2"));
+        receiptsTable->setItem(currentRow, 2, new QTableWidgetItem("0.00"));
+
+        // Optionally, you can store the file path or display the image
+        // For example, you could add another column for the file path or display the image in a separate widget
+    } else {
+        // User canceled the dialog
+        qDebug() << "No file selected.";
+    }
 }
 
 // function to set up the analytics page
