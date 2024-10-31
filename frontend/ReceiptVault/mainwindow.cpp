@@ -145,7 +145,7 @@ void MainWindow::handleLogin(const QString &username, const QString &password)
 }
 
 // function to handle the create account process
-void MainWindow::handleCreateAccount(const QString &email, const QString &username, const QString &password)
+void MainWindow::handleCreateAccount(const QString &username, const QString &password)
 {
     // Simulate account creation (e.g., save to database)
     // Here, just show a success message
