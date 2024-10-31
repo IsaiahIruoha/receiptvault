@@ -330,18 +330,18 @@ void MainWindow::setupReceiptsPage()
     receiptsTable->setItem(1, 2, new QTableWidgetItem("45.00"));
 }
 
-// New slot implementation
+// new receipt implementation
 void MainWindow::handleUploadReceipt()
 {
     // Open a file dialog to select an image file
     QString fileName = QFileDialog::getOpenFileName(this, "Select Receipt Image", "",
                                                     "Images (*.png *.xpm *.jpg *.jpeg *.bmp);;All Files (*)");
     if (!fileName.isEmpty()) {
-        // For now, just display the selected file path in debug
+        // for now just display the selected file path in debug
         qDebug() << "Selected file:" << fileName;
 
-        // Placeholder: In future, integrate OCR processing here
-        // Example: Send the file path to Python OCR module and get the extracted data
+        // integrate OCR processing here
+        // Example, send the file path to Python OCR module and get the extracted data
 
         // For demonstration, let's add a mock entry to the receipts table
         int currentRow = receiptsTable->rowCount();
@@ -352,8 +352,8 @@ void MainWindow::handleUploadReceipt()
         receiptsTable->setItem(currentRow, 1, new QTableWidgetItem("Item1, Item2"));
         receiptsTable->setItem(currentRow, 2, new QTableWidgetItem("0.00"));
 
-        // Optionally, you can store the file path or display the image
-        // For example, you could add another column for the file path or display the image in a separate widget
+        // Optionally store the file path or display the image
+        // Or could add another column for the file path or display the image in a separate widget
     } else {
         // User canceled the dialog
         qDebug() << "No file selected.";
