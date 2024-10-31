@@ -3,10 +3,14 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QTableWidget>
-#include <QtCharts/QChartView>
+
+// Include the new page classes
+#include "pages/LoginPage.h"
+#include "pages/CreateAccountPage.h"
+#include "pages/DashboardPage.h"
+#include "pages/ReceiptsPage.h"
+#include "pages/AnalyticsPage.h"
+#include "pages/BudgetsPage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,69 +21,25 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow(); // Declare destructor
+    ~MainWindow();
 
 private slots:
-    void handleLogin();
-    void handleCreateAccount();
+    void handleLogin(const QString &username, const QString &password);
+    void handleCreateAccount(const QString &email, const QString &username, const QString &password);
     void navigateToDashboard();
     void navigateToLogin();
-
-    // New slot for handling receipt upload
     void handleUploadReceipt();
 
 private:
     QStackedWidget *stackedWidget;
 
-    // Pages
-    QWidget *loginPage;
-    QWidget *createAccountPage;
-    QWidget *dashboardPage;
-    QWidget *receiptsPage;
-    QWidget *analyticsPage;
-    QWidget *budgetsPage;
-
-    // Login Page Widgets
-    QLineEdit *loginUsernameEdit;
-    QLineEdit *loginPasswordEdit;
-    QPushButton *loginButton;
-    QPushButton *toCreateAccountButton;
-
-    // Create Account Page Widgets
-    QLineEdit *createEmailEdit;
-    QLineEdit *createUsernameEdit;
-    QLineEdit *createPasswordEdit;
-    QLineEdit *createConfirmPasswordEdit;
-    QPushButton *createAccountButton;
-    QPushButton *toLoginButton;
-
-    // Dashboard Page Widgets
-    QPushButton *viewReceiptsButton;
-    QPushButton *viewAnalyticsButton;
-    QPushButton *viewBudgetsButton;
-    QPushButton *logoutButton;
-
-    // Receipts Page Widgets
-    QTableWidget *receiptsTable;
-    QPushButton *backToDashboardButtonReceipts;
-
-    // New Upload Receipt Button
-    QPushButton *uploadReceiptButton;
-
-    // Analytics Page Widgets
-    QChartView *pieChartView;
-    QPushButton *backToDashboardButtonAnalytics;
-
-    // Budgets Page Widgets
-    QPushButton *backToDashboardButtonBudgets;
-
-    // Methods to set up each page
-    void setupLoginPage();
-    void setupCreateAccountPage();
-    void setupDashboardPage();
-    void setupReceiptsPage();
-    void setupAnalyticsPage();
-    void setupBudgetsPage();
+    // Page instances
+    LoginPage *loginPage;
+    CreateAccountPage *createAccountPage;
+    DashboardPage *dashboardPage;
+    ReceiptsPage *receiptsPage;
+    AnalyticsPage *analyticsPage;
+    BudgetsPage *budgetsPage;
 
     // Method to apply styles
     void applyStyles();

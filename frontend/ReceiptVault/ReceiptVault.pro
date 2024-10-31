@@ -3,14 +3,32 @@ QT += core gui widgets charts sql
 CONFIG += sdk_no_version_check
 CONFIG += c++17
 
+# Source Files
 SOURCES += main.cpp \
-           mainwindow.cpp
+           mainwindow.cpp \
+           pages/LoginPage.cpp \
+           pages/CreateAccountPage.cpp \
+           pages/DashboardPage.cpp \
+           pages/ReceiptsPage.cpp \
+           pages/AnalyticsPage.cpp \
+           pages/BudgetsPage.cpp
 
-HEADERS += mainwindow.h
+# Header Files
+HEADERS += mainwindow.h \
+           pages/LoginPage.h \
+           pages/CreateAccountPage.h \
+           pages/DashboardPage.h \
+           pages/ReceiptsPage.h \
+           pages/AnalyticsPage.h \
+           pages/BudgetsPage.h
 
+# Resource Files
 RESOURCES += resources.qrc
 
+# Translation Files
 TRANSLATIONS += ReceiptVault_en_CA.ts
+
+# Configuration for translations
 CONFIG += lrelease
 CONFIG += embed_translations
 
