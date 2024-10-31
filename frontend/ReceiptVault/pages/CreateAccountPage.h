@@ -12,11 +12,10 @@ public:
     explicit CreateAccountPage(QWidget *parent = nullptr);
 
 signals:
-    void accountCreationRequested(const QString &email, const QString &username, const QString &password);
+    void accountCreationRequested(const QString &username, const QString &password);
     void navigateToLogin();
 
 private:
-    QLineEdit *createEmailEdit;
     QLineEdit *createUsernameEdit;
     QLineEdit *createPasswordEdit;
     QLineEdit *createConfirmPasswordEdit;

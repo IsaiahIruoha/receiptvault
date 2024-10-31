@@ -25,7 +25,7 @@ public:
 
 private slots:
     void handleLogin(const QString &username, const QString &password);
-    void handleCreateAccount(const QString &email, const QString &username, const QString &password);
+    void handleCreateAccount(const QString &username, const QString &password);
     void navigateToDashboard();
     void navigateToLogin();
     void handleUploadReceipt();
