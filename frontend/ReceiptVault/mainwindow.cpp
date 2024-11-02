@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -7,20 +10,26 @@
 #include <QFile>
 #include <QPainter>
 #include <QDebug>
-#include <QFileDialog> // For file dialog
-
-// include qt charts modules
+#include <QFileDialog>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QHeaderView>
+#include "pages/DatabaseManager.h"
+#include <QCryptographicHash>
 
 using namespace Qt;
 
-// constructor for mainwindow class
+// constructor for MainWindow
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // use DatabaseManager to open the database
+    if (!DatabaseManager::instance().openDatabase("../../../../../../../backend/db/receiptvault.db")) {
+        QMessageBox::critical(this, "Database Connection Error", "Unable to connect to the database.");
+        exit(EXIT_FAILURE);
+    }
+
     // set the window title and size
     setWindowTitle("ReceiptVault - Budget Tracking App");
     resize(1000, 600);
@@ -51,47 +60,66 @@ MainWindow::MainWindow(QWidget *parent)
     // apply external styles
     applyStyles();
 
-    // Connect signals from LoginPage
-    connect(loginPage, &LoginPage::loginRequested, this, &MainWindow::handleLogin);
+    // navigate to CreateAccountPage
     connect(loginPage, &LoginPage::navigateToCreateAccount, [this]() {
         stackedWidget->setCurrentWidget(createAccountPage);
     });
 
-    // Connect signals from CreateAccountPage
-    connect(createAccountPage, &CreateAccountPage::accountCreationRequested, this, &MainWindow::handleCreateAccount);
+    // navigate back to LoginPage
     connect(createAccountPage, &CreateAccountPage::navigateToLogin, [this]() {
         stackedWidget->setCurrentWidget(loginPage);
     });
 
-    // Connect signals from DashboardPage
+    // connect signals for LoginPage
+    connect(loginPage, &LoginPage::loginRequested, this, &MainWindow::handleLogin);
+
+    // connect signals for CreateAccountPage
+    connect(createAccountPage, &CreateAccountPage::accountCreationRequested, this, &MainWindow::handleCreateAccount);
+
+    // connect signals for DashboardPage
     connect(dashboardPage, &DashboardPage::navigateToReceipts, [this]() {
-        stackedWidget->setCurrentWidget(receiptsPage);
+        if (currentUserId != -1) {
+            receiptsPage->loadReceipts(currentUserId);
+            stackedWidget->setCurrentWidget(receiptsPage);
+        } else {
+            QMessageBox::warning(this, "Error", "User ID not found. Please log in again.");
+        }
     });
-    connect(dashboardPage, &DashboardPage::navigateToAnalytics, [this]() {
-        stackedWidget->setCurrentWidget(analyticsPage);
-    });
+
+    connect(dashboardPage, &DashboardPage::navigateToAnalytics, this, &MainWindow::handleNavigateToAnalytics);
+
     connect(dashboardPage, &DashboardPage::navigateToBudgets, [this]() {
-        stackedWidget->setCurrentWidget(budgetsPage);
+        if (currentUserId != -1) {
+            budgetsPage->loadBudgets(currentUserId);
+            stackedWidget->setCurrentWidget(budgetsPage);
+        } else {
+            QMessageBox::warning(this, "Error", "User ID not found. Please log in again.");
+        }
     });
+
     connect(dashboardPage, &DashboardPage::logoutRequested, [this]() {
-        // Clear any sensitive information
+        // clear any sensitive information
         loginPage->findChild<QLineEdit*>("loginUsernameEdit")->clear();
         loginPage->findChild<QLineEdit*>("loginPasswordEdit")->clear();
         currentUsername.clear();
-        // Navigate back to the login page
+        currentUserId = -1; // reset currentUserId
+        // navigate back to the login page
         stackedWidget->setCurrentWidget(loginPage);
     });
 
-    // Connect signals from ReceiptsPage
+
+
+    // connect signals for ReceiptsPage
     connect(receiptsPage, &ReceiptsPage::navigateToDashboard, this, &MainWindow::navigateToDashboard);
     connect(receiptsPage, &ReceiptsPage::uploadReceipt, this, &MainWindow::handleUploadReceipt);
 
-    // Connect signals from AnalyticsPage and BudgetsPage
+    // connect signals for AnalyticsPage and BudgetsPage
     connect(analyticsPage, &AnalyticsPage::navigateToDashboard, this, &MainWindow::navigateToDashboard);
     connect(budgetsPage, &BudgetsPage::navigateToDashboard, this, &MainWindow::navigateToDashboard);
 }
 
-// destructor for mainwindow class
+
+// destructor for MainWindow
 MainWindow::~MainWindow()
 {
 }
@@ -100,7 +128,7 @@ MainWindow::~MainWindow()
 void MainWindow::applyStyles()
 {
     // load the external stylesheet from resources
-    QFile styleFile(":/styles/style.qss"); // path to the style.qss in resources
+    QFile styleFile(":/styles/style.qss"); // Path to the style.qss in resources
     if (styleFile.open(QFile::ReadOnly)) {
         // read the stylesheet content
         QString style = QLatin1String(styleFile.readAll());
@@ -114,45 +142,6 @@ void MainWindow::applyStyles()
         // print a debug message if the stylesheet failed to load
         qDebug() << "Failed to load style.qss";
     }
-}
-
-// function to handle the login process
-void MainWindow::handleLogin(const QString &username, const QString &password)
-{
-    // check if either the username or password fields are empty
-    if (username.isEmpty() || password.isEmpty()) {
-        // show a warning message if any fields are empty
-        QMessageBox::warning(this, "Input Error", "Please enter both username and password.");
-        return;
-    }
-
-    // define hardcoded credentials for testing
-    QString correctUsername = "admin";
-    QString correctPassword = "password123";
-
-    // check if the entered credentials match the hardcoded ones
-    if (username == correctUsername && password == correctPassword) {
-        // show an information message indicating successful login
-        // QMessageBox::information(this, "Success", "Login successful!"); // removed login affirmation
-        // store the current username
-        currentUsername = username;
-        // navigate to the dashboard page
-        stackedWidget->setCurrentWidget(dashboardPage);
-    } else {
-        // show a warning message indicating failed login
-        QMessageBox::warning(this, "Login Failed", "Incorrect username or password.");
-    }
-}
-
-// function to handle the create account process
-void MainWindow::handleCreateAccount(const QString &username, const QString &password)
-{
-    // Simulate account creation (e.g., save to database)
-    // Here, just show a success message
-    QMessageBox::information(this, "Success", "Account created successfully!");
-
-    // Navigate back to the login page
-    stackedWidget->setCurrentWidget(loginPage);
 }
 
 // function to navigate back to the dashboard
@@ -172,22 +161,142 @@ void MainWindow::navigateToLogin()
 // function to handle receipt upload
 void MainWindow::handleUploadReceipt()
 {
-    // Open a file dialog to select an image file
+    // get the current user ID
+    int userId = getCurrentUserId();
+    if (userId == -1) {
+        QMessageBox::warning(this, "Error", "User not found. Please log in again.");
+        return;
+    }
+
+    // open a file dialog to select an image file
     QString fileName = QFileDialog::getOpenFileName(this, "Select Receipt Image", "",
                                                     "Images (*.pdf *.png *.jpg *.jpeg);;All Files (*)");
     if (!fileName.isEmpty()) {
-        // For now, just display the selected file path in debug
+        // display the selected file path in debug
         qDebug() << "Selected file:" << fileName;
 
-        // Placeholder: In future, integrate OCR processing here
+        // Placeholder: In future, integrate OCR processing here to extract store, items, and total
+        // For demonstration, we'll use mock data
+        QString store = "New Store";            // Replace with OCR-extracted or user-input data
+        QString items = "Item1, Item2";        // Replace with OCR-extracted or user-input data
+        double totalAmount = 50.00;            // Replace with OCR-extracted or user-input data
+        QString description = "Receipt uploaded"; // Can be a default value or extracted
 
-        // For demonstration, let's add a mock entry to the receipts table
-        receiptsPage->addReceipt("New Store", "Item1, Item2", "0.00");
+        // Assign a default category or allow the user to select
+        // For better flexibility, you can prompt the user to select a category
+        // Here, we'll assume categoryId = 1 (e.g., "Groceries")
+        int categoryId = 1; // Replace with dynamic category selection if needed
 
-        // Optionally, you can store the file path or display the image
-        // For example, you could add another column for the file path or display the image in a separate widget
+        // Get the current date
+        QString currentDate = QDate::currentDate().toString("yyyy-MM-dd");
+
+        // Add the expense to the database with all 7 required arguments
+        bool success = DatabaseManager::instance().addExpense(userId, categoryId, store, items, currentDate, totalAmount, description);
+
+        if (success) {
+            // Add to the receipts table UI
+            QString totalStr = QString::number(totalAmount, 'f', 2);
+            receiptsPage->addReceipt(store, items, totalStr);
+
+            QMessageBox::information(this, "Success", "Receipt uploaded successfully!");
+        } else {
+            QMessageBox::critical(this, "Database Error", "Failed to upload receipt.");
+        }
     } else {
         // User canceled the dialog
         qDebug() << "No file selected.";
+    }
+}
+
+// Function to get the current user's ID
+int MainWindow::getCurrentUserId()
+{
+    return currentUserId;
+}
+
+void MainWindow::handleNavigateToAnalytics()
+{
+    int userId = getCurrentUserId();
+    if (userId == -1) {
+        QMessageBox::warning(this, "Error", "User not found. Please log in again.");
+        return;
+    }
+
+    // Fetch category expenses from the database
+    QList<QPair<QString, double>> categoryExpenses = DatabaseManager::instance().getCategoryExpenses(userId);
+
+    // Update the AnalyticsPage with the fetched data
+    analyticsPage->updateChartData(categoryExpenses);
+
+    // Navigate to the AnalyticsPage
+    stackedWidget->setCurrentWidget(analyticsPage);
+}
+
+void MainWindow::handleLogin(const QString &username, const QString &password)
+{
+    // Check if either the username or password fields are empty
+    if (username.isEmpty() || password.isEmpty()) {
+        QMessageBox::warning(this, "Input Error", "Please enter both username and password.");
+        return;
+    }
+
+    // Fetch stored hashed password and salt
+    QString storedHashedPassword, storedSalt;
+    bool userExists = DatabaseManager::instance().getUserCredentials(username, storedHashedPassword, storedSalt);
+
+    if (!userExists) {
+        QMessageBox::warning(this, "Login Failed", "Incorrect username or password.");
+        return;
+    }
+
+    // Hash the entered password with the stored salt
+    QByteArray saltedPassword = password.toUtf8() + storedSalt.toUtf8();
+    QByteArray hashedPassword = QCryptographicHash::hash(saltedPassword, QCryptographicHash::Sha256).toHex();
+
+    // Verify user
+    bool verified = DatabaseManager::instance().verifyUser(username, hashedPassword);
+
+    if (verified) {
+        // Successful login
+        QMessageBox::information(this, "Success", "Login successful!");
+        currentUsername = username;
+
+        // Retrieve and store user ID
+        QSqlQuery query(DatabaseManager::instance().getDatabase());
+        query.prepare("SELECT user_id FROM users WHERE username = :username");
+        query.bindValue(":username", currentUsername);
+        if (query.exec() && query.next()) {
+            currentUserId = query.value("user_id").toInt();
+        } else {
+            qDebug() << "Failed to retrieve user ID:" << query.lastError().text();
+            QMessageBox::critical(this, "Error", "Failed to retrieve user information.");
+            return;
+        }
+
+        stackedWidget->setCurrentWidget(dashboardPage);
+    } else {
+        QMessageBox::warning(this, "Login Failed", "Incorrect username or password.");
+    }
+}
+
+void MainWindow::handleCreateAccount(const QString &username, const QString &password)
+{
+    // Input validation already done in CreateAccountPage
+
+    // Generate a unique salt
+    QString salt = QString::number(QDateTime::currentMSecsSinceEpoch());
+
+    // Hash the password with the salt using SHA-256
+    QByteArray saltedPassword = password.toUtf8() + salt.toUtf8();
+    QByteArray hashedPassword = QCryptographicHash::hash(saltedPassword, QCryptographicHash::Sha256).toHex();
+
+    // Insert into the database
+    bool success = DatabaseManager::instance().createUser(username, hashedPassword, salt);
+
+    if (success) {
+        QMessageBox::information(this, "Success", "Account created successfully!");
+        stackedWidget->setCurrentWidget(loginPage);
+    } else {
+        QMessageBox::critical(this, "Registration Error", "Failed to create account. Username might already exist.");
     }
 }

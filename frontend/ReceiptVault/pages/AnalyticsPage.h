@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QtCharts/QChartView>
+#include <QList>
+#include <QPair>
 
 class AnalyticsPage : public QWidget
 {
@@ -11,6 +13,7 @@ class AnalyticsPage : public QWidget
 public:
     explicit AnalyticsPage(QWidget *parent = nullptr);
 
+    // method to update the chart with new data
     void updateChartData(const QList<QPair<QString, double>> &data);
 
 signals:
@@ -23,4 +26,4 @@ private:
     void setupUI();
 };
 
-#endif // ANALYTICSPAGE_H
+#endif

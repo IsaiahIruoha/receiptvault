@@ -3,6 +3,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
+#include <QDebug>
+#include "DatabaseManager.h"
+#include <QSqlQuery>
+#include <QSqlError>
 
 ReceiptsPage::ReceiptsPage(QWidget *parent) : QWidget(parent)
 {
@@ -13,7 +17,7 @@ void ReceiptsPage::setupUI()
 {
     QVBoxLayout *receiptsLayout = new QVBoxLayout(this);
 
-    // Header Layout with Title and Upload Button
+    // header layout with title and upload button
     QHBoxLayout *headerLayout = new QHBoxLayout;
 
     QLabel *receiptsLabel = new QLabel("Receipts", this);
@@ -21,10 +25,9 @@ void ReceiptsPage::setupUI()
     receiptsLabel->setObjectName("titleLabel");
 
     uploadReceiptButton = new QPushButton("Upload Receipt", this);
-    // Optionally set an icon: uploadReceiptButton->setIcon(QIcon(":/icons/upload.png"));
 
     headerLayout->addWidget(receiptsLabel);
-    headerLayout->addStretch(); // Push the upload button to the right
+    headerLayout->addStretch(); // push the upload button to right side
     headerLayout->addWidget(uploadReceiptButton);
 
     receiptsLayout->addLayout(headerLayout);
@@ -40,26 +43,15 @@ void ReceiptsPage::setupUI()
 
     receiptsLayout->addWidget(receiptsTable);
 
-    // Back to Dashboard Button
+    // backt o dashboard button
     backToDashboardButton = new QPushButton("Back to Dashboard", this);
     receiptsLayout->addWidget(backToDashboardButton);
 
-    // Connect button signals to emit custom signals
+    // connect button signals to emit
     connect(backToDashboardButton, &QPushButton::clicked, this, &ReceiptsPage::navigateToDashboard);
     connect(uploadReceiptButton, &QPushButton::clicked, this, &ReceiptsPage::uploadReceipt);
 
-    // Populate with mock data
-    receiptsTable->setRowCount(2); // Example with 2 receipts
 
-    // First receipt entry
-    receiptsTable->setItem(0, 0, new QTableWidgetItem("SuperMart"));
-    receiptsTable->setItem(0, 1, new QTableWidgetItem("Milk, Bread, Eggs"));
-    receiptsTable->setItem(0, 2, new QTableWidgetItem("15.75"));
-
-    // Second receipt entry
-    receiptsTable->setItem(1, 0, new QTableWidgetItem("ElectroShop"));
-    receiptsTable->setItem(1, 1, new QTableWidgetItem("Headphones"));
-    receiptsTable->setItem(1, 2, new QTableWidgetItem("45.00"));
 }
 
 void ReceiptsPage::addReceipt(const QString &store, const QString &items, const QString &total)
@@ -70,3 +62,27 @@ void ReceiptsPage::addReceipt(const QString &store, const QString &items, const 
     receiptsTable->setItem(currentRow, 1, new QTableWidgetItem(items));
     receiptsTable->setItem(currentRow, 2, new QTableWidgetItem(total));
 }
+
+void ReceiptsPage::loadReceipts(int userId)
+{
+    receiptsTable->setRowCount(0); // Clear existing rows
+
+    // fetch receipts from the database
+    QSqlDatabase db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    query.prepare("SELECT store, items, expense_amount FROM expenses WHERE user_id = :user_id");
+    query.bindValue(":user_id", userId);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString store = query.value("store").toString();
+            QString items = query.value("items").toString();
+            QString total = QString::number(query.value("expense_amount").toDouble(), 'f', 2);
+            addReceipt(store, items, total);
+        }
+    } else {
+        qDebug() << "Error loading receipts:" << query.lastError().text();
+    }
+}
+
+

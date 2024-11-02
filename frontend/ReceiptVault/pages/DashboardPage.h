@@ -25,4 +25,4 @@ private:
     void setupUI();
 };
 
-#endif // DASHBOARDPAGE_H
+#endif

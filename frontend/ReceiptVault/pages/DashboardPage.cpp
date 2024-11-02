@@ -28,7 +28,7 @@ void DashboardPage::setupUI()
     dashboardLayout->addStretch();
     dashboardLayout->addWidget(logoutButton);
 
-    // Connect button signals to emit custom signals
+    // connect button signals emite signals
     connect(viewReceiptsButton, &QPushButton::clicked, this, &DashboardPage::navigateToReceipts);
     connect(viewAnalyticsButton, &QPushButton::clicked, this, &DashboardPage::navigateToAnalytics);
     connect(viewBudgetsButton, &QPushButton::clicked, this, &DashboardPage::navigateToBudgets);

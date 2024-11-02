@@ -11,8 +11,11 @@ class ReceiptsPage : public QWidget
 public:
     explicit ReceiptsPage(QWidget *parent = nullptr);
 
-    // Method to add a receipt entry
+    // method to add a receipt entry to the table
     void addReceipt(const QString &store, const QString &items, const QString &total);
+
+    // method to load receipts from the database for a specific user
+    void loadReceipts(int userId);
 
 signals:
     void navigateToDashboard();
@@ -26,4 +29,4 @@ private:
     void setupUI();
 };
 
-#endif // RECEIPTSPAGE_H
+#endif

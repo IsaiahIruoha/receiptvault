@@ -4,17 +4,13 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 
-// Include the new page classes
+// include the new page classes
 #include "pages/LoginPage.h"
 #include "pages/CreateAccountPage.h"
 #include "pages/DashboardPage.h"
 #include "pages/ReceiptsPage.h"
 #include "pages/AnalyticsPage.h"
 #include "pages/BudgetsPage.h"
-
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
@@ -29,11 +25,12 @@ private slots:
     void navigateToDashboard();
     void navigateToLogin();
     void handleUploadReceipt();
+    void handleNavigateToAnalytics();
 
 private:
     QStackedWidget *stackedWidget;
 
-    // Page instances
+    // page instances
     LoginPage *loginPage;
     CreateAccountPage *createAccountPage;
     DashboardPage *dashboardPage;
@@ -41,11 +38,15 @@ private:
     AnalyticsPage *analyticsPage;
     BudgetsPage *budgetsPage;
 
-    // Method to apply styles
+    // apply styling qss
     void applyStyles();
 
-    // Store current user's username
+    // store current user's username and user ID
     QString currentUsername;
+    int currentUserId;
+
+    // method to get current user ID
+    int getCurrentUserId();
 };
 
-#endif // MAINWINDOW_H
+#endif

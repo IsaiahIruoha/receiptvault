@@ -24,4 +24,4 @@ private:
     void setupUI();
 };
 
-#endif // LOGINPAGE_H
+#endif

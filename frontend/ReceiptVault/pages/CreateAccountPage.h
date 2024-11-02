@@ -25,4 +25,4 @@ private:
     void setupUI();
 };
 
-#endif // CREATEACCOUNTPAGE_H
+#endif
