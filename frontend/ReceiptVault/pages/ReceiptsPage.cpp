@@ -32,7 +32,7 @@ void ReceiptsPage::setupUI()
 
     receiptsLayout->addLayout(headerLayout);
 
-    // Table to Display Receipts
+    // table to Display Receipts
     receiptsTable = new QTableWidget(this);
     receiptsTable->setColumnCount(3);
     receiptsTable->setHorizontalHeaderLabels({"Store", "Items", "Total"});

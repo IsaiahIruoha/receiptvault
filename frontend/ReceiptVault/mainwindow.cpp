@@ -175,26 +175,25 @@ void MainWindow::handleUploadReceipt()
         // display the selected file path in debug
         qDebug() << "Selected file:" << fileName;
 
-        // Placeholder: In future, integrate OCR processing here to extract store, items, and total
+        // PLACEHOLDER: In future, integrate OCR processing here to extract store, items, and total
         // For demonstration, we'll use mock data
-        QString store = "New Store";            // Replace with OCR-extracted or user-input data
-        QString items = "Item1, Item2";        // Replace with OCR-extracted or user-input data
-        double totalAmount = 50.00;            // Replace with OCR-extracted or user-input data
-        QString description = "Receipt uploaded"; // Can be a default value or extracted
+        QString store = "New Store";            // replace with OCR-extracted or user-input data
+        QString items = "Item1, Item2";        // replace with OCR-extracted or user-input data
+        double totalAmount = 50.00;            // replace with OCR-extracted or user-input data
+        QString description = "Receipt uploaded"; // can be a default value or extracted
 
-        // Assign a default category or allow the user to select
-        // For better flexibility, you can prompt the user to select a category
-        // Here, we'll assume categoryId = 1 (e.g., "Groceries")
-        int categoryId = 1; // Replace with dynamic category selection if needed
+        // assign a default category or allow the user to select (TBD)
+        // here, we'll assume categoryId = 1 (e.g., "Groceries")
+        int categoryId = 1; // replace with dynamic category selection in future issue
 
-        // Get the current date
+        // get the current date
         QString currentDate = QDate::currentDate().toString("yyyy-MM-dd");
 
-        // Add the expense to the database with all 7 required arguments
+        // add the expense to the database with all 7 required arguments
         bool success = DatabaseManager::instance().addExpense(userId, categoryId, store, items, currentDate, totalAmount, description);
 
         if (success) {
-            // Add to the receipts table UI
+            // add to the receipts table UI
             QString totalStr = QString::number(totalAmount, 'f', 2);
             receiptsPage->addReceipt(store, items, totalStr);
 
@@ -203,12 +202,12 @@ void MainWindow::handleUploadReceipt()
             QMessageBox::critical(this, "Database Error", "Failed to upload receipt.");
         }
     } else {
-        // User canceled the dialog
+        // user canceled the dialog
         qDebug() << "No file selected.";
     }
 }
 
-// Function to get the current user's ID
+// function to get the current user's ID
 int MainWindow::getCurrentUserId()
 {
     return currentUserId;
@@ -222,25 +221,25 @@ void MainWindow::handleNavigateToAnalytics()
         return;
     }
 
-    // Fetch category expenses from the database
+    // fetch category expenses from the database
     QList<QPair<QString, double>> categoryExpenses = DatabaseManager::instance().getCategoryExpenses(userId);
 
-    // Update the AnalyticsPage with the fetched data
+    // update the AnalyticsPage with the fetched data
     analyticsPage->updateChartData(categoryExpenses);
 
-    // Navigate to the AnalyticsPage
+    // navigate to the AnalyticsPage
     stackedWidget->setCurrentWidget(analyticsPage);
 }
 
 void MainWindow::handleLogin(const QString &username, const QString &password)
 {
-    // Check if either the username or password fields are empty
+    // check if either the username or password fields are empty
     if (username.isEmpty() || password.isEmpty()) {
         QMessageBox::warning(this, "Input Error", "Please enter both username and password.");
         return;
     }
 
-    // Fetch stored hashed password and salt
+    // fetch stored hashed password and salt
     QString storedHashedPassword, storedSalt;
     bool userExists = DatabaseManager::instance().getUserCredentials(username, storedHashedPassword, storedSalt);
 
@@ -249,19 +248,19 @@ void MainWindow::handleLogin(const QString &username, const QString &password)
         return;
     }
 
-    // Hash the entered password with the stored salt
+    // hash the entered password with the stored salt
     QByteArray saltedPassword = password.toUtf8() + storedSalt.toUtf8();
     QByteArray hashedPassword = QCryptographicHash::hash(saltedPassword, QCryptographicHash::Sha256).toHex();
 
-    // Verify user
+    // verify user
     bool verified = DatabaseManager::instance().verifyUser(username, hashedPassword);
 
     if (verified) {
-        // Successful login
+        // successful login
         QMessageBox::information(this, "Success", "Login successful!");
         currentUsername = username;
 
-        // Retrieve and store user ID
+        // retrieve and store user ID
         QSqlQuery query(DatabaseManager::instance().getDatabase());
         query.prepare("SELECT user_id FROM users WHERE username = :username");
         query.bindValue(":username", currentUsername);
@@ -281,16 +280,15 @@ void MainWindow::handleLogin(const QString &username, const QString &password)
 
 void MainWindow::handleCreateAccount(const QString &username, const QString &password)
 {
-    // Input validation already done in CreateAccountPage
 
-    // Generate a unique salt
+    // generate a unique salt (salting enhances the security of hashed passwords by adding random data)
     QString salt = QString::number(QDateTime::currentMSecsSinceEpoch());
 
-    // Hash the password with the salt using SHA-256
+    // hash the password with the salt using SHA-256
     QByteArray saltedPassword = password.toUtf8() + salt.toUtf8();
     QByteArray hashedPassword = QCryptographicHash::hash(saltedPassword, QCryptographicHash::Sha256).toHex();
 
-    // Insert into the database
+    // insert into the database
     bool success = DatabaseManager::instance().createUser(username, hashedPassword, salt);
 
     if (success) {

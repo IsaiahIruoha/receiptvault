@@ -4,7 +4,6 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QCryptographicHash>
-#include "DatabaseManager.h"
 
 LoginPage::LoginPage(QWidget *parent) : QWidget(parent)
 {
