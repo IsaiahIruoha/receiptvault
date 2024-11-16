@@ -127,12 +127,12 @@ void ReceiptsPage::addReceipt(const QString &store, const QString &total, const 
 
 void ReceiptsPage::loadReceipts(int userId)
 {
-    receiptsTable->setRowCount(0); // Clear existing rows
+    receiptsTable->setRowCount(0); // clear existing rows
 
-    // Store the current user ID
+    // store the current user ID
     currentUserId = userId;
 
-    // Fetch receipts from the database
+    // fetch receipts from the database
     QSqlDatabase db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
     query.prepare("SELECT expense_id, store, expense_amount, expense_date, category_id FROM expenses WHERE user_id = :user_id");
@@ -169,10 +169,10 @@ void ReceiptsPage::editSelectedReceipt()
 
     int selectedRow = receiptsTable->row(selectedItems.first());
 
-    // Retrieve expense_id from UserRole
+    // retrieve expense_id from UserRole
     QTableWidgetItem *storeItem = receiptsTable->item(selectedRow, 0);
     int expenseId = storeItem->data(Qt::UserRole).toInt();
 
-    // Emit the signal to MainWindow
+    // emit the signal
     emit editReceipt(expenseId);
 }

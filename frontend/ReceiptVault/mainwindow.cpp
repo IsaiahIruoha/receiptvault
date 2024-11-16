@@ -17,6 +17,9 @@
 #include "pages/DatabaseManager.h"
 #include <QCryptographicHash>
 #include <QInputDialog>
+#include <QProcess>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 using namespace Qt;
 
@@ -164,29 +167,77 @@ void MainWindow::navigateToLogin()
 // function to handle receipt upload
 void MainWindow::handleUploadReceipt()
 {
-    // Get the current user ID
+    // get current user id
     int userId = getCurrentUserId();
     if (userId == -1) {
         QMessageBox::warning(this, "Error", "User not found. Please log in again.");
         return;
     }
 
-    // Open a file dialog to select an image file
-    QString fileName = QFileDialog::getOpenFileName(this, "Select Receipt Image", "",
-                                                    "Images (*.pdf *.png *.jpg *.jpeg);;All Files (*)");
+    // open a file dialog to select PDF file
+    QString fileName = QFileDialog::getOpenFileName(this, "Select Receipt PDF", "",
+                                                    "Images (*.pdf);;All Files (*)");
     if (!fileName.isEmpty()) {
-        // Display the selected file path in debug
-        qDebug() << "Selected file:" << fileName;
+        // define the python executable and script path
+        QString pythonExecutable = "python3"; // might need to change to "python" depending on the system
+        QString scriptPath = "/path/to/extract_receipt_info.py"; // UPDATE THIS ONCE PYTHON DONE
 
-        // Placeholder: In future, integrate OCR processing here to extract store, total, and date
-        // For demonstration, we'll use mock data
-        QString store = "New Store";            // Replace with OCR-extracted or user-input data
-        double totalAmount = 75.50;             // Replace with OCR-extracted or user-input data
-        QString description = "Receipt uploaded"; // Can be a default value or extracted
-        QString date = QDate::currentDate().toString("yyyy-MM-dd"); // Replace with extracted date
+        // prepare the process arguments which includes the path the pdf
+        QStringList arguments;
+        arguments << scriptPath << fileName;
 
-        // Assign a default category or allow the user to select
-        // For better flexibility, prompt the user to select a category
+        // initialize the QProcess
+        QProcess pythonProcess;
+        pythonProcess.setProgram(pythonExecutable);
+        pythonProcess.setArguments(arguments);
+
+        // start the Python script
+        pythonProcess.start();
+        if (!pythonProcess.waitForStarted()) {
+            QMessageBox::critical(this, "Error", "Failed to start Python process.");
+            qDebug() << "Python process failed to start.";
+            return;
+        }
+
+        // wait for the Python script to finish
+        if (!pythonProcess.waitForFinished()) {
+            QMessageBox::critical(this, "Error", "Python process did not finish.");
+            qDebug() << "Python process did not finish.";
+            return;
+        }
+
+        // read the standard output and error
+        QString output = pythonProcess.readAllStandardOutput();
+        QString errorOutput = pythonProcess.readAllStandardError();
+
+        // check for Python errors
+        if (!errorOutput.isEmpty()) {
+            QMessageBox::critical(this, "Python Error", errorOutput);
+            qDebug() << "Python Error:" << errorOutput;
+            return;
+        }
+
+        // parse the JSON output
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(output.toUtf8());
+        if (!jsonDoc.isObject()) {
+            QMessageBox::critical(this, "Error", "Invalid JSON response from Python script.");
+            qDebug() << "Invalid JSON:" << output;
+            return;
+        }
+
+        QJsonObject jsonObj = jsonDoc.object();
+        QString store = jsonObj["store"].toString();
+        double totalAmount = jsonObj["total"].toDouble();
+        QString date = jsonObj["date"].toString();
+
+        // validate extracted data
+        if (store.isEmpty() || totalAmount <= 0.0 || date.isEmpty()) {
+            QMessageBox::critical(this, "Error", "Incomplete data extracted from receipt.");
+            qDebug() << "Incomplete data:" << jsonObj;
+            return;
+        }
+
+        // assign a default category or allow the user to select
         QComboBox *categoryComboBox = new QComboBox(this);
         receiptsPage->populateCategoryComboBox(categoryComboBox);
         bool ok;
@@ -197,13 +248,16 @@ void MainWindow::handleUploadReceipt()
             return;
         }
 
-        // Add the expense to the database with all required arguments
+        // default description, could enhance
+        QString description = "Receipt uploaded";
+
+        // add the expense to the database
         bool success = DatabaseManager::instance().addExpense(userId, selectedCategoryId, store, date, totalAmount, description);
 
         if (success) {
-            // Retrieve the last inserted expense_id
+            // retrieve the last inserted expense_id
             QSqlQuery query(DatabaseManager::instance().getDatabase());
-            query.exec("SELECT last_insert_rowid()"); // For SQLite. Use appropriate method for other DBs.
+            query.exec("SELECT last_insert_rowid()"); // For SQLite. Adjust if using another DB.
             int expenseId = -1;
             if (query.next()) {
                 expenseId = query.value(0).toInt();
@@ -216,14 +270,16 @@ void MainWindow::handleUploadReceipt()
                 QMessageBox::information(this, "Success", "Receipt uploaded successfully!");
             } else {
                 QMessageBox::critical(this, "Error", "Failed to retrieve expense ID.");
+                qDebug() << "Failed to retrieve expense ID.";
             }
         } else {
             QMessageBox::critical(this, "Database Error", "Failed to upload receipt.");
+            qDebug() << "Failed to upload receipt to database.";
         }
 
         delete categoryComboBox; // Clean up
     } else {
-        // User canceled the dialog
+        // user canceled the dialog
         qDebug() << "No file selected.";
     }
 }
