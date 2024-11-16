@@ -10,36 +10,30 @@ class ReceiptsPage : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ReceiptsPage(QWidget *parent = nullptr);
+    explicit ReceiptsPage(QWidget *parent = nullptr); // constructor
 
-    // Method to add a receipt entry to the table
-    void addReceipt(const QString &store, const QString &total, const QString &date, int categoryId, int expenseId);
-
-    // Method to load receipts from the database for a specific user
-    void loadReceipts(int userId);
-
-    // Set the current user ID
-    void setCurrentUserId(int userId);
-
-    void populateCategoryComboBox(QComboBox *comboBox);
+    void addReceipt(const QString &store, const QString &total, const QString &date, int categoryId, int expenseId); // add a receipt to the table
+    void loadReceipts(int userId); // load user receipts
+    void setCurrentUserId(int userId); // set the current user ID
+    void populateCategoryComboBox(QComboBox *comboBox); // fill category dropdown
 
 signals:
-    void navigateToDashboard();
-    void uploadReceipt();
-    void editReceipt(int expenseId);
+    void navigateToDashboard(); // signal to go back to dashboard
+    void uploadReceipt(); // signal to upload a receipt
+    void editReceipt(int expenseId); // signal to edit a receipt
 
 public slots:
-    void editSelectedReceipt();
+    void editSelectedReceipt(); // handles editing a selected receipt
 
 private:
-    QTableWidget *receiptsTable;
-    QPushButton *backToDashboardButton;
-    QPushButton *uploadReceiptButton;
-    QPushButton *editReceiptButton; // New Edit Receipt Button
+    QTableWidget *receiptsTable; // table for displaying receipts
+    QPushButton *backToDashboardButton; // button to return to dashboard
+    QPushButton *uploadReceiptButton; // button to upload a receipt
+    QPushButton *editReceiptButton; // button to edit a receipt
 
-    int currentUserId; // To store the current user ID
+    int currentUserId; // stores the user ID
 
-    void setupUI();
+    void setupUI(); // sets up the UI
 };
 
-#endif // RECEIPTSPAGE_H
+#endif

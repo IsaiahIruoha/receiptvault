@@ -12,17 +12,17 @@ public:
     explicit CreateAccountPage(QWidget *parent = nullptr);
 
 signals:
-    void accountCreationRequested(const QString &username, const QString &password);
-    void navigateToLogin();
+    void accountCreationRequested(const QString &username, const QString &password); // signal for account creation
+    void navigateToLogin(); // signal to navigate back to login
 
 private:
-    QLineEdit *createUsernameEdit;
-    QLineEdit *createPasswordEdit;
-    QLineEdit *createConfirmPasswordEdit;
-    QPushButton *createAccountButton;
-    QPushButton *toLoginButton;
+    QLineEdit *createUsernameEdit; // input for username
+    QLineEdit *createPasswordEdit; // input for password
+    QLineEdit *createConfirmPasswordEdit; // input to confirm password
+    QPushButton *createAccountButton; // button to create account
+    QPushButton *toLoginButton; // button to go to login page
 
-    void setupUI();
+    void setupUI(); // sets up the ui
 };
 
 #endif

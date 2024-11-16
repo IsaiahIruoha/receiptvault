@@ -16,37 +16,37 @@ class BudgetsPage : public QWidget
 public:
     explicit BudgetsPage(QWidget *parent = nullptr);
 
-    // method to load budgets from the database for a specific user
+    // loads budgets for the user
     void loadBudgets(int userId);
 
 signals:
     void navigateToDashboard();
 
 private slots:
-    void addBudget();
-    void editBudget();
-    void deleteBudget();
+    void addBudget(); // adds a budget
+    void editBudget(); // edits a budget
+    void deleteBudget(); // deletes a budget
 
 private:
-    int currentUserId;
+    int currentUserId; // stores user id
 
-    QTableWidget *budgetsTable;
-    QPushButton *backToDashboardButton;
-    QPushButton *addBudgetButton;
-    QPushButton *editBudgetButton;
-    QPushButton *deleteBudgetButton;
+    QTableWidget *budgetsTable; // table for budgets
+    QPushButton *backToDashboardButton; // back button
+    QPushButton *addBudgetButton; // button to add budget
+    QPushButton *editBudgetButton; // button to edit budget
+    QPushButton *deleteBudgetButton; // button to delete budget
 
-    QLineEdit *budgetNameEdit;
-    QLineEdit *amountEdit;
-    QComboBox *categoryComboBox;
-    QDateEdit *startDateEdit;
-    QDateEdit *endDateEdit;
+    QLineEdit *budgetNameEdit; // input for budget name
+    QLineEdit *amountEdit; // input for budget amount
+    QComboBox *categoryComboBox; // dropdown for category
+    QDateEdit *startDateEdit; // start date input
+    QDateEdit *endDateEdit; // end date input
 
-    QVBoxLayout *mainLayout;
-    QFormLayout *formLayout;
+    QVBoxLayout *mainLayout; // main layout
+    QFormLayout *formLayout; // form layout
 
-    void setupUI();
-    void refreshBudgetsTable();
+    void setupUI(); // sets up the ui
+    void refreshBudgetsTable(); // refreshes the table
 };
 
 #endif

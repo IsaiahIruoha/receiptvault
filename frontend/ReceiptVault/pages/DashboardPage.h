@@ -11,18 +11,18 @@ public:
     explicit DashboardPage(QWidget *parent = nullptr);
 
 signals:
-    void navigateToReceipts();
-    void navigateToAnalytics();
-    void navigateToBudgets();
-    void logoutRequested();
+    void navigateToReceipts(); // signal to go to receipts page
+    void navigateToAnalytics(); // signal to go to analytics page
+    void navigateToBudgets(); // signal to go to budgets page
+    void logoutRequested(); // signal for logout
 
 private:
-    QPushButton *viewReceiptsButton;
-    QPushButton *viewAnalyticsButton;
-    QPushButton *viewBudgetsButton;
-    QPushButton *logoutButton;
+    QPushButton *viewReceiptsButton; // button to view receipts
+    QPushButton *viewAnalyticsButton; // button to view analytics
+    QPushButton *viewBudgetsButton; // button to view budgets
+    QPushButton *logoutButton; // button to log out
 
-    void setupUI();
+    void setupUI(); // sets up the ui
 };
 
 #endif

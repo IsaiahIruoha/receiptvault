@@ -9,45 +9,33 @@
 class DatabaseManager
 {
 public:
-    // singleton instance accessor
-    static DatabaseManager& instance();
+    static DatabaseManager& instance(); // gets singleton instance
 
-    //opens the database and creates tables if needed
-    bool openDatabase(const QString &databasePath);
+    bool openDatabase(const QString &databasePath); // opens db and creates tables if needed
+    QSqlDatabase& getDatabase(); // gets the database object
 
-    // getter for the QSqlDatabase instance
-    QSqlDatabase& getDatabase();
+    // user-related methods
+    bool createUser(const QString &username, const QString &hashedPassword, const QString &salt); // creates user
+    bool verifyUser(const QString &username, const QString &hashedPassword); // verifies user login
+    bool getUserCredentials(const QString &username, QString &hashedPassword, QString &salt); // fetches user creds
 
-    // user related methods
-    bool createUser(const QString &username, const QString &hashedPassword, const QString &salt);
-    bool verifyUser(const QString &username, const QString &hashedPassword);
-    bool getUserCredentials(const QString &username, QString &hashedPassword, QString &salt);
+    // category-related methods
+    bool addCategory(const QString &categoryName); // adds a new category
 
-    // category related methods
-    bool addCategory(const QString &categoryName);
-
-    // expense related methods
-    bool addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description);
-    QList<QPair<QString, double>> getCategoryExpenses(int userId);
-
-    // Adds in DatabaseManager class
-    QList<QPair<int, QString>> getAllCategories();
+    // expense-related methods
+    bool addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description); // adds an expense
+    QList<QPair<QString, double>> getCategoryExpenses(int userId); // gets expense totals by category
+    QList<QPair<int, QString>> getAllCategories(); // fetches all categories
 
 private:
-    // private constructor for Singleton
-    DatabaseManager();
+    DatabaseManager(); // private constructor
+    ~DatabaseManager(); // private destructor
 
-    // private destructor
-    ~DatabaseManager();
+    DatabaseManager(const DatabaseManager&) = delete; // disallow copy
+    DatabaseManager& operator=(const DatabaseManager&) = delete; // disallow assignment
 
-    // disallow copy and assignment
-    DatabaseManager(const DatabaseManager&) = delete;
-    DatabaseManager& operator=(const DatabaseManager&) = delete;
-
-    // creates necessary tables
-    bool createTables();
-
-    QSqlDatabase db;
+    bool createTables(); // creates required tables
+    QSqlDatabase db; // the database instance
 };
 
 #endif

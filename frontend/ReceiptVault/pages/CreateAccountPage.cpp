@@ -4,41 +4,43 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QCryptographicHash>
-#include <QDateTime> // Include for QDateTime
-#include "DatabaseManager.h"
+#include <QDateTime> // for timestamp generation
 
+// constructor for CreateAccountPage
 CreateAccountPage::CreateAccountPage(QWidget *parent) : QWidget(parent)
 {
-    setupUI();
+    setupUI(); // setup the page's UI
 }
 
+// sets up the UI layout
 void CreateAccountPage::setupUI()
 {
-    QVBoxLayout *createLayout = new QVBoxLayout(this);
+    QVBoxLayout *createLayout = new QVBoxLayout(this); // main layout
 
+    // title label
     QLabel *createLabel = new QLabel("Create Account", this);
-    createLabel->setObjectName("titleLabel");
+    createLabel->setObjectName("titleLabel"); // for styling
     createLabel->setAlignment(Qt::AlignCenter);
 
-    // user
+    // username input field
     createUsernameEdit = new QLineEdit(this);
     createUsernameEdit->setPlaceholderText("Username");
 
-    // pass
+    // password input field
     createPasswordEdit = new QLineEdit(this);
     createPasswordEdit->setPlaceholderText("Password");
-    createPasswordEdit->setEchoMode(QLineEdit::Password);
+    createPasswordEdit->setEchoMode(QLineEdit::Password); // hide input
 
-    // confirm pass
+    // confirm password input field
     createConfirmPasswordEdit = new QLineEdit(this);
     createConfirmPasswordEdit->setPlaceholderText("Confirm Password");
-    createConfirmPasswordEdit->setEchoMode(QLineEdit::Password);
+    createConfirmPasswordEdit->setEchoMode(QLineEdit::Password); // hide input
 
-    // create account and back button
+    // buttons for creating account and navigating back to login
     createAccountButton = new QPushButton("Create Account", this);
     toLoginButton = new QPushButton("Back to Login", this);
 
-    // add widgets to layout
+    // add widgets to the layout
     createLayout->addWidget(createLabel);
     createLayout->addWidget(createUsernameEdit);
     createLayout->addWidget(createPasswordEdit);
@@ -46,25 +48,27 @@ void CreateAccountPage::setupUI()
     createLayout->addWidget(createAccountButton);
     createLayout->addWidget(toLoginButton);
 
-    // connect button signals
+    // handle create account button click
     connect(createAccountButton, &QPushButton::clicked, [this]() {
-        QString username = createUsernameEdit->text().trimmed();
-        QString password = createPasswordEdit->text();
-        QString confirmPassword = createConfirmPasswordEdit->text();
+        QString username = createUsernameEdit->text().trimmed(); // get username
+        QString password = createPasswordEdit->text();           // get password
+        QString confirmPassword = createConfirmPasswordEdit->text(); // get confirmation
 
-        // input validation
+        // check if fields are filled
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             QMessageBox::warning(this, "Input Error", "Please fill in all fields.");
             return;
         }
 
+        // check if passwords match
         if (password != confirmPassword) {
             QMessageBox::warning(this, "Input Error", "Passwords do not match.");
             return;
         }
 
-        emit accountCreationRequested(username, password); // emit signal for account creation (happens in main wind0w)
+        emit accountCreationRequested(username, password); // signal account creation (handled in main window)
     });
 
+    // handle back to login button click
     connect(toLoginButton, &QPushButton::clicked, this, &CreateAccountPage::navigateToLogin);
 }

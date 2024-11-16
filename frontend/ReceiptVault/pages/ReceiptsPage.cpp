@@ -16,16 +16,18 @@
 #include <QDateEdit>
 #include <QDialogButtonBox>
 
+// constructor for ReceiptsPage
 ReceiptsPage::ReceiptsPage(QWidget *parent) : QWidget(parent), currentUserId(-1)
 {
-    setupUI();
+    setupUI(); // sets up the page layout
 }
 
+// sets up the UI layout
 void ReceiptsPage::setupUI()
 {
     QVBoxLayout *receiptsLayout = new QVBoxLayout(this);
 
-    // Header Layout with Title and Upload/Edit Buttons
+    // header layout with title and buttons
     QHBoxLayout *headerLayout = new QHBoxLayout;
 
     QLabel *receiptsLabel = new QLabel("Receipts", this);
@@ -33,16 +35,16 @@ void ReceiptsPage::setupUI()
     receiptsLabel->setObjectName("titleLabel");
 
     uploadReceiptButton = new QPushButton("Upload Receipt", this);
-    editReceiptButton = new QPushButton("Edit Receipt", this); // Initialize Edit Button
+    editReceiptButton = new QPushButton("Edit Receipt", this); // edit button
 
     headerLayout->addWidget(receiptsLabel);
-    headerLayout->addStretch(); // Push the buttons to the right
+    headerLayout->addStretch(); // aligns buttons to the right
     headerLayout->addWidget(uploadReceiptButton);
-    headerLayout->addWidget(editReceiptButton); // Add Edit Button to Layout
+    headerLayout->addWidget(editReceiptButton);
 
     receiptsLayout->addLayout(headerLayout);
 
-    // Table to Display Receipts
+    // table to display receipts
     receiptsTable = new QTableWidget(this);
     receiptsTable->setColumnCount(4);
     receiptsTable->setHorizontalHeaderLabels({"Store", "Total", "Date", "Category"});
@@ -53,16 +55,17 @@ void ReceiptsPage::setupUI()
 
     receiptsLayout->addWidget(receiptsTable);
 
-    // Back to Dashboard Button
+    // back to dashboard button
     backToDashboardButton = new QPushButton("Back to Dashboard", this);
     receiptsLayout->addWidget(backToDashboardButton);
 
-    // Connect button signals to emit custom signals
+    // connect signals to slots
     connect(backToDashboardButton, &QPushButton::clicked, this, &ReceiptsPage::navigateToDashboard);
     connect(uploadReceiptButton, &QPushButton::clicked, this, &ReceiptsPage::uploadReceipt);
-    connect(editReceiptButton, &QPushButton::clicked, this, &ReceiptsPage::editSelectedReceipt); // Connect Edit Button
+    connect(editReceiptButton, &QPushButton::clicked, this, &ReceiptsPage::editSelectedReceipt); // edit receipt
 }
 
+// populates the category combo box
 void ReceiptsPage::populateCategoryComboBox(QComboBox *comboBox)
 {
     QList<QPair<int, QString>> categories = DatabaseManager::instance().getAllCategories();
@@ -71,44 +74,43 @@ void ReceiptsPage::populateCategoryComboBox(QComboBox *comboBox)
     }
 }
 
+// adds a new receipt to the table
 void ReceiptsPage::addReceipt(const QString &store, const QString &total, const QString &date, int categoryId, int expenseId)
 {
     int currentRow = receiptsTable->rowCount();
     receiptsTable->insertRow(currentRow);
 
-    // Store Column
+    // store column
     QTableWidgetItem *storeItem = new QTableWidgetItem(store);
-    storeItem->setData(Qt::UserRole, expenseId); // Store expense_id for later reference
+    storeItem->setData(Qt::UserRole, expenseId); // stores expense ID
     receiptsTable->setItem(currentRow, 0, storeItem);
 
-    // Total Column
+    // total column
     QTableWidgetItem *totalItem = new QTableWidgetItem(total);
     receiptsTable->setItem(currentRow, 1, totalItem);
 
-    // Date Column
+    // date column
     QTableWidgetItem *dateItem = new QTableWidgetItem(date);
     receiptsTable->setItem(currentRow, 2, dateItem);
 
-    // Category Column with Dropdown
+    // category dropdown
     QComboBox *categoryComboBox = new QComboBox(this);
     populateCategoryComboBox(categoryComboBox);
 
-    // Set the current category
+    // set current category
     int comboBoxIndex = categoryComboBox->findData(categoryId);
     if (comboBoxIndex != -1) {
         categoryComboBox->setCurrentIndex(comboBoxIndex);
     }
 
-    // Connect the ComboBox signal to handle category changes
-    connect(categoryComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+    // connect dropdown changes to update the database
+    connect(categoryComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
         QVariant data = categoryComboBox->itemData(index);
         if (data.isValid()) {
             int selectedCategoryId = data.toInt();
 
-            // Retrieve expense_id stored in UserRole
+            // updates the category in the database
             int expenseId = storeItem->data(Qt::UserRole).toInt();
-
-            // Update the category in the database
             QSqlQuery updateQuery(DatabaseManager::instance().getDatabase());
             updateQuery.prepare("UPDATE expenses SET category_id = :category_id WHERE expense_id = :expense_id AND user_id = :user_id");
             updateQuery.bindValue(":category_id", selectedCategoryId);
@@ -122,19 +124,17 @@ void ReceiptsPage::addReceipt(const QString &store, const QString &total, const 
         }
     });
 
-    receiptsTable->setCellWidget(currentRow, 3, categoryComboBox);
+    receiptsTable->setCellWidget(currentRow, 3, categoryComboBox); // adds the dropdown
 }
 
+// loads receipts for the current user
 void ReceiptsPage::loadReceipts(int userId)
 {
-    receiptsTable->setRowCount(0); // clear existing rows
+    receiptsTable->setRowCount(0); // clears table
 
-    // store the current user ID
-    currentUserId = userId;
+    currentUserId = userId; // store user ID
 
-    // fetch receipts from the database
-    QSqlDatabase db = DatabaseManager::instance().getDatabase();
-    QSqlQuery query(db);
+    QSqlQuery query(DatabaseManager::instance().getDatabase());
     query.prepare("SELECT expense_id, store, expense_amount, expense_date, category_id FROM expenses WHERE user_id = :user_id");
     query.bindValue(":user_id", userId);
 
@@ -147,18 +147,20 @@ void ReceiptsPage::loadReceipts(int userId)
             QString date = query.value("expense_date").toString();
             int categoryId = query.value("category_id").toInt();
 
-            addReceipt(store, total, date, categoryId, expenseId);
+            addReceipt(store, total, date, categoryId, expenseId); // adds receipt to table
         }
     } else {
         qDebug() << "Error loading receipts:" << query.lastError().text();
     }
 }
 
+// sets the current user ID
 void ReceiptsPage::setCurrentUserId(int userId)
 {
     currentUserId = userId;
 }
 
+// handles editing the selected receipt
 void ReceiptsPage::editSelectedReceipt()
 {
     QList<QTableWidgetItem*> selectedItems = receiptsTable->selectedItems();
@@ -169,10 +171,10 @@ void ReceiptsPage::editSelectedReceipt()
 
     int selectedRow = receiptsTable->row(selectedItems.first());
 
-    // retrieve expense_id from UserRole
+    // retrieves the expense ID from UserRole
     QTableWidgetItem *storeItem = receiptsTable->item(selectedRow, 0);
     int expenseId = storeItem->data(Qt::UserRole).toInt();
 
-    // emit the signal
+    // emit signal for editing receipt
     emit editReceipt(expenseId);
 }

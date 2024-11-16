@@ -3,8 +3,6 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
-
-// include the new page classes
 #include "pages/LoginPage.h"
 #include "pages/CreateAccountPage.h"
 #include "pages/DashboardPage.h"
@@ -16,21 +14,20 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr); // constructor
+    ~MainWindow(); // destructor
 
-    // Add the slot for editing receipts
 private slots:
-    void handleLogin(const QString &username, const QString &password);
-    void handleCreateAccount(const QString &username, const QString &password);
-    void navigateToDashboard();
-    void navigateToLogin();
-    void handleUploadReceipt();
-    void handleNavigateToAnalytics();
-    void handleEditReceipt(int expenseId);
+    void handleLogin(const QString &username, const QString &password); // process login
+    void handleCreateAccount(const QString &username, const QString &password); // process account creation
+    void navigateToDashboard(); // switch to dashboard
+    void navigateToLogin(); // switch to login
+    void handleUploadReceipt(); // handle receipt upload
+    void handleNavigateToAnalytics(); // go to analytics
+    void handleEditReceipt(int expenseId); // handle receipt editing
 
 private:
-    QStackedWidget *stackedWidget;
+    QStackedWidget *stackedWidget; // manages the page stack
 
     // page instances
     LoginPage *loginPage;
@@ -40,15 +37,11 @@ private:
     AnalyticsPage *analyticsPage;
     BudgetsPage *budgetsPage;
 
-    // apply styling qss
-    void applyStyles();
+    void applyStyles(); // apply external styles
+    int getCurrentUserId(); // get current user ID
 
-    // store current user's username and user ID
-    QString currentUsername;
-    int currentUserId;
-
-    // method to get current user ID
-    int getCurrentUserId();
+    QString currentUsername; // store current username
+    int currentUserId; // store current user ID
 };
 
 #endif
