@@ -19,6 +19,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    // Add the slot for editing receipts
 private slots:
     void handleLogin(const QString &username, const QString &password);
     void handleCreateAccount(const QString &username, const QString &password);
@@ -26,6 +27,7 @@ private slots:
     void navigateToLogin();
     void handleUploadReceipt();
     void handleNavigateToAnalytics();
+    void handleEditReceipt(int expenseId);
 
 private:
     QStackedWidget *stackedWidget;

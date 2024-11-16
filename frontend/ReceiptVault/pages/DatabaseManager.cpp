@@ -146,6 +146,24 @@ bool DatabaseManager::createUser(const QString &username, const QString &hashedP
     return true;
 }
 
+QList<QPair<int, QString>> DatabaseManager::getAllCategories()
+{
+    QList<QPair<int, QString>> categories;
+    QSqlQuery query(db);
+    query.prepare("SELECT category_id, category_name FROM expense_category ORDER BY category_name ASC");
+    if (query.exec()) {
+        while (query.next()) {
+            int id = query.value("category_id").toInt();
+            QString name = query.value("category_name").toString();
+            categories.append(qMakePair(id, name));
+        }
+    } else {
+        qDebug() << "Error fetching categories:" << query.lastError().text();
+    }
+    return categories;
+}
+
+
 bool DatabaseManager::verifyUser(const QString &username, const QString &hashedPassword)
 {
     QSqlQuery query(db);
@@ -197,15 +215,16 @@ bool DatabaseManager::addCategory(const QString &categoryName)
 }
 
 // adds an expense to the expenses table
-bool DatabaseManager::addExpense(int userId, int categoryId, const QString &store, const QString &items, const QString &date, double amount, const QString &description)
+bool DatabaseManager::addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description)
 {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO expenses (user_id, category_id, store, items, expense_date, expense_amount, description) "
-                  "VALUES (:user_id, :category_id, :store, :items, :expense_date, :expense_amount, :description)");
+    query.prepare(R"(
+        INSERT INTO expenses (user_id, category_id, store, expense_date, expense_amount, description)
+        VALUES (:user_id, :category_id, :store, :expense_date, :expense_amount, :description)
+    )");
     query.bindValue(":user_id", userId);
     query.bindValue(":category_id", categoryId);
     query.bindValue(":store", store);
-    query.bindValue(":items", items);
     query.bindValue(":expense_date", date);
     query.bindValue(":expense_amount", amount);
     query.bindValue(":description", description);

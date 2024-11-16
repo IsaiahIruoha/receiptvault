@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -17,6 +16,7 @@
 #include <QHeaderView>
 #include "pages/DatabaseManager.h"
 #include <QCryptographicHash>
+#include <QInputDialog>
 
 using namespace Qt;
 
@@ -116,6 +116,9 @@ MainWindow::MainWindow(QWidget *parent)
     // connect signals for AnalyticsPage and BudgetsPage
     connect(analyticsPage, &AnalyticsPage::navigateToDashboard, this, &MainWindow::navigateToDashboard);
     connect(budgetsPage, &BudgetsPage::navigateToDashboard, this, &MainWindow::navigateToDashboard);
+
+    connect(receiptsPage, &ReceiptsPage::editReceipt, this, &MainWindow::handleEditReceipt);
+
 }
 
 
@@ -161,48 +164,66 @@ void MainWindow::navigateToLogin()
 // function to handle receipt upload
 void MainWindow::handleUploadReceipt()
 {
-    // get the current user ID
+    // Get the current user ID
     int userId = getCurrentUserId();
     if (userId == -1) {
         QMessageBox::warning(this, "Error", "User not found. Please log in again.");
         return;
     }
 
-    // open a file dialog to select an image file
+    // Open a file dialog to select an image file
     QString fileName = QFileDialog::getOpenFileName(this, "Select Receipt Image", "",
                                                     "Images (*.pdf *.png *.jpg *.jpeg);;All Files (*)");
     if (!fileName.isEmpty()) {
-        // display the selected file path in debug
+        // Display the selected file path in debug
         qDebug() << "Selected file:" << fileName;
 
-        // PLACEHOLDER: In future, integrate OCR processing here to extract store, items, and total
+        // Placeholder: In future, integrate OCR processing here to extract store, total, and date
         // For demonstration, we'll use mock data
-        QString store = "New Store";            // replace with OCR-extracted or user-input data
-        QString items = "Item1, Item2";        // replace with OCR-extracted or user-input data
-        double totalAmount = 50.00;            // replace with OCR-extracted or user-input data
-        QString description = "Receipt uploaded"; // can be a default value or extracted
+        QString store = "New Store";            // Replace with OCR-extracted or user-input data
+        double totalAmount = 75.50;             // Replace with OCR-extracted or user-input data
+        QString description = "Receipt uploaded"; // Can be a default value or extracted
+        QString date = QDate::currentDate().toString("yyyy-MM-dd"); // Replace with extracted date
 
-        // assign a default category or allow the user to select (TBD)
-        // here, we'll assume categoryId = 1 (e.g., "Groceries")
-        int categoryId = 1; // replace with dynamic category selection in future issue
+        // Assign a default category or allow the user to select
+        // For better flexibility, prompt the user to select a category
+        QComboBox *categoryComboBox = new QComboBox(this);
+        receiptsPage->populateCategoryComboBox(categoryComboBox);
+        bool ok;
+        int selectedCategoryId = categoryComboBox->currentData().toInt(&ok);
+        if (!ok) {
+            QMessageBox::warning(this, "Input Error", "Please select a valid category.");
+            delete categoryComboBox;
+            return;
+        }
 
-        // get the current date
-        QString currentDate = QDate::currentDate().toString("yyyy-MM-dd");
-
-        // add the expense to the database with all 7 required arguments
-        bool success = DatabaseManager::instance().addExpense(userId, categoryId, store, items, currentDate, totalAmount, description);
+        // Add the expense to the database with all required arguments
+        bool success = DatabaseManager::instance().addExpense(userId, selectedCategoryId, store, date, totalAmount, description);
 
         if (success) {
-            // add to the receipts table UI
-            QString totalStr = QString::number(totalAmount, 'f', 2);
-            receiptsPage->addReceipt(store, items, totalStr);
+            // Retrieve the last inserted expense_id
+            QSqlQuery query(DatabaseManager::instance().getDatabase());
+            query.exec("SELECT last_insert_rowid()"); // For SQLite. Use appropriate method for other DBs.
+            int expenseId = -1;
+            if (query.next()) {
+                expenseId = query.value(0).toInt();
+            }
 
-            QMessageBox::information(this, "Success", "Receipt uploaded successfully!");
+            if(expenseId != -1){
+                QString totalStr = QString::number(totalAmount, 'f', 2);
+                receiptsPage->addReceipt(store, totalStr, date, selectedCategoryId, expenseId);
+
+                QMessageBox::information(this, "Success", "Receipt uploaded successfully!");
+            } else {
+                QMessageBox::critical(this, "Error", "Failed to retrieve expense ID.");
+            }
         } else {
             QMessageBox::critical(this, "Database Error", "Failed to upload receipt.");
         }
+
+        delete categoryComboBox; // Clean up
     } else {
-        // user canceled the dialog
+        // User canceled the dialog
         qDebug() << "No file selected.";
     }
 }
@@ -296,5 +317,65 @@ void MainWindow::handleCreateAccount(const QString &username, const QString &pas
         stackedWidget->setCurrentWidget(loginPage);
     } else {
         QMessageBox::critical(this, "Registration Error", "Failed to create account. Username might already exist.");
+    }
+}
+
+void MainWindow::handleEditReceipt(int expenseId)
+{
+    // Fetch receipt details from the database
+    QSqlQuery query(DatabaseManager::instance().getDatabase());
+    query.prepare("SELECT store, expense_amount, expense_date, category_id FROM expenses WHERE expense_id = :expense_id AND user_id = :user_id");
+    query.bindValue(":expense_id", expenseId);
+    query.bindValue(":user_id", currentUserId);
+
+    if (!query.exec() || !query.next()) {
+        QMessageBox::critical(this, "Error", "Failed to retrieve receipt details.");
+        return;
+    }
+
+    QString store = query.value("store").toString();
+    double amount = query.value("expense_amount").toDouble();
+    QString date = query.value("expense_date").toString();
+    int categoryId = query.value("category_id").toInt();
+
+    // Prompt user to edit details using QInputDialog
+    bool ok;
+    QString newStore = QInputDialog::getText(this, "Edit Store", "Store:", QLineEdit::Normal, store, &ok);
+    if (!ok || newStore.isEmpty()) return;
+
+    QString newAmountStr = QInputDialog::getText(this, "Edit Total", "Total Amount:", QLineEdit::Normal, QString::number(amount, 'f', 2), &ok);
+    if (!ok) return;
+    double newAmount = newAmountStr.toDouble(&ok);
+    if (!ok || newAmount <= 0) {
+        QMessageBox::warning(this, "Input Error", "Please enter a valid amount.");
+        return;
+    }
+
+    QString newDate = QInputDialog::getText(this, "Edit Date", "Date (YYYY-MM-DD):", QLineEdit::Normal, date, &ok);
+    if (!ok || !QDate::fromString(newDate, "yyyy-MM-dd").isValid()) {
+        QMessageBox::warning(this, "Input Error", "Please enter a valid date.");
+        return;
+    }
+
+    // Update the database
+    QSqlQuery updateQuery(DatabaseManager::instance().getDatabase());
+    updateQuery.prepare(R"(
+        UPDATE expenses
+        SET store = :store, expense_amount = :amount, expense_date = :date, category_id = :category_id
+        WHERE expense_id = :expense_id AND user_id = :user_id
+    )");
+    updateQuery.bindValue(":store", newStore);
+    updateQuery.bindValue(":amount", newAmount);
+    updateQuery.bindValue(":date", newDate);
+    updateQuery.bindValue(":category_id", categoryId); // Update as needed
+    updateQuery.bindValue(":expense_id", expenseId);
+    updateQuery.bindValue(":user_id", currentUserId);
+
+    if (updateQuery.exec()) {
+        QMessageBox::information(this, "Success", "Receipt updated successfully!");
+        receiptsPage->loadReceipts(currentUserId);
+    } else {
+        QMessageBox::critical(this, "Database Error", "Failed to update receipt.");
+        qDebug() << "Update error:" << updateQuery.lastError().text();
     }
 }

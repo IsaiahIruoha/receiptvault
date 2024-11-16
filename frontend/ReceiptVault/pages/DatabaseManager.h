@@ -27,8 +27,11 @@ public:
     bool addCategory(const QString &categoryName);
 
     // expense related methods
-    bool addExpense(int userId, int categoryId, const QString &store, const QString &items, const QString &date, double amount, const QString &description);
+    bool addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description);
     QList<QPair<QString, double>> getCategoryExpenses(int userId);
+
+    // Adds in DatabaseManager class
+    QList<QPair<int, QString>> getAllCategories();
 
 private:
     // private constructor for Singleton
