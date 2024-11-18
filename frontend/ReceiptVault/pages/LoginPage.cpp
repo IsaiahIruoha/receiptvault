@@ -1,59 +1,31 @@
 #include "LoginPage.h"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QMessageBox>
-#include <QCryptographicHash>
 
-// constructor for LoginPage
-LoginPage::LoginPage(QWidget *parent) : QWidget(parent)
+// Constructor
+LoginPage::LoginPage(QWidget *parent)
+    : QWidget(parent), ui(new Ui::LoginPage) // Initialize the UI pointer
 {
-    setupUI(); // sets up the login UI
-}
+    ui->setupUi(this); // Sets up the UI from the .ui file
 
-// sets up the UI layout
-void LoginPage::setupUI()
-{
-    QVBoxLayout *loginLayout = new QVBoxLayout(this); // main layout
-
-    // title label
-    QLabel *loginLabel = new QLabel("Login", this);
-    loginLabel->setObjectName("titleLabel"); // for styling
-    loginLabel->setAlignment(Qt::AlignCenter);
-
-    // username field
-    loginUsernameEdit = new QLineEdit(this);
-    loginUsernameEdit->setPlaceholderText("Username");
-
-    // password field
-    loginPasswordEdit = new QLineEdit(this);
-    loginPasswordEdit->setPlaceholderText("Password");
-    loginPasswordEdit->setEchoMode(QLineEdit::Password); // hides the input text
-
-    // buttons
-    loginButton = new QPushButton("Login", this);
-    toCreateAccountButton = new QPushButton("Create Account", this);
-
-    // add widgets to layout
-    loginLayout->addWidget(loginLabel);
-    loginLayout->addWidget(loginUsernameEdit);
-    loginLayout->addWidget(loginPasswordEdit);
-    loginLayout->addWidget(loginButton);
-    loginLayout->addWidget(toCreateAccountButton);
-
-    // connect login button signal
-    connect(loginButton, &QPushButton::clicked, [this]() {
-        QString username = loginUsernameEdit->text().trimmed();
-        QString password = loginPasswordEdit->text();
+    // Connect login button signal
+    connect(ui->loginButton, &QPushButton::clicked, this, [this]() {
+        QString username = ui->loginUsernameEdit->text().trimmed();
+        QString password = ui->loginPasswordEdit->text();
 
         if (username.isEmpty() || password.isEmpty()) {
             QMessageBox::warning(this, "Input Error", "Please enter both username and password.");
             return;
         }
 
-        emit loginRequested(username, password); // emit signal for login (handled in main window)
+        emit loginRequested(username, password); // Emit signal for login (handled in main window)
     });
 
-    // connect create account button signal
-    connect(toCreateAccountButton, &QPushButton::clicked, this, &LoginPage::navigateToCreateAccount);
+    // Connect create account button signal
+    connect(ui->toCreateAccountButton, &QPushButton::clicked, this, &LoginPage::navigateToCreateAccount);
+}
+
+// Destructor
+LoginPage::~LoginPage()
+{
+    delete ui; // Clean up the UI object
 }

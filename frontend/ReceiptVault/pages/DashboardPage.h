@@ -2,13 +2,18 @@
 #define DASHBOARDPAGE_H
 
 #include <QWidget>
-#include <QPushButton>
+#include "ui_DashboardPage.h" // include the generated UI header
+
+namespace Ui {
+class DashboardPage;
+}
 
 class DashboardPage : public QWidget
 {
     Q_OBJECT
 public:
     explicit DashboardPage(QWidget *parent = nullptr);
+    ~DashboardPage(); // Destructor to clean up
 
 signals:
     void navigateToReceipts(); // signal to go to receipts page
@@ -17,12 +22,7 @@ signals:
     void logoutRequested(); // signal for logout
 
 private:
-    QPushButton *viewReceiptsButton; // button to view receipts
-    QPushButton *viewAnalyticsButton; // button to view analytics
-    QPushButton *viewBudgetsButton; // button to view budgets
-    QPushButton *logoutButton; // button to log out
-
-    void setupUI(); // sets up the ui
+    Ui::DashboardPage *ui; // Pointer to UI object generated from .ui file
 };
 
-#endif
+#endif // DASHBOARDPAGE_H

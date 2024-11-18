@@ -138,8 +138,8 @@ void MainWindow::applyStyles()
     if (styleFile.open(QFile::ReadOnly)) {
         // read the stylesheet content
         QString style = QLatin1String(styleFile.readAll());
-        // apply the stylesheet to the main window
-        this->setStyleSheet(style);
+        // apply the stylesheet to the global app
+        qApp->setStyleSheet(style);
         // close the file
         styleFile.close();
         // print a debug message indicating successful loading
