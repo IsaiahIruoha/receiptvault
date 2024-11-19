@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BudgetsPage</class>
+ <widget class="QWidget" name="BudgetsPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>925</width>
+    <height>556</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget {
+    background-color: white;
+}</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0" colspan="3">
+    <widget class="QTableWidget" name="table_Budgets">
+     <property name="styleSheet">
+      <string notr="true">QTableWidget{
+    border-radius: 10px;
+    background-color: white;
+    gridline-color: rgb(220, 220, 220);
+    font: 14px &quot;Arial&quot;;
+}
+
+QHeaderView::section {
+    background-color: rgb(28, 130, 255);
+    color: white;
+    font: bold 14px &quot;Arial&quot;;
+    padding: 4px;
+    border: 1px solid rgb(200, 200, 200);
+}
+
+QTableWidget::item:selected {
+    background-color: rgb(28, 130, 255);
+    color: white;
+}
+</string>
+     </property>
+     <property name="columnCount">
+      <number>5</number>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderMinimumSectionSize">
+      <number>19</number>
+     </attribute>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>175</number>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Budget ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Category</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Amount</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Start Date</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>End Date</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_BudgetsTitle">
+     <property name="styleSheet">
+      <string notr="true">QLabel  {
+    color: black;
+    font: bold 35px &quot;Palatino Linotype&quot;;
+    padding: 10px;
+}</string>
+     </property>
+     <property name="text">
+      <string>Budgets</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="button_AddBudget">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: rgb(28, 130, 255);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 20px;
+    font: bold 15px &quot;Arial&quot;;
+}
+
+QPushButton:hover {
+    background-color: rgb(33, 145, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(23, 110, 230);
+}</string>
+       </property>
+       <property name="text">
+        <string>Add Budget</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_EditBudget">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: rgb(28, 130, 255);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 20px;
+    font: bold 15px &quot;Arial&quot;;
+}
+
+QPushButton:hover {
+    background-color: rgb(33, 145, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(23, 110, 230);
+}</string>
+       </property>
+       <property name="text">
+        <string>Edit Budget</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_DeleteBudget">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: rgb(28, 130, 255);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 20px;
+    font: bold 15px &quot;Arial&quot;;
+}
+
+QPushButton:hover {
+    background-color: rgb(33, 145, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(23, 110, 230);
+}</string>
+       </property>
+       <property name="text">
+        <string>Delete Budget</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_BackToDashboard">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: rgb(28, 130, 255);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 20px;
+    font: bold 15px &quot;Arial&quot;;
+}
+
+QPushButton:hover {
+    background-color: rgb(33, 145, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(23, 110, 230);
+}</string>
+       </property>
+       <property name="text">
+        <string>Back to Dashboard</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

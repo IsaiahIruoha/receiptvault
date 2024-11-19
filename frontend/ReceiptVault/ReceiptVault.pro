@@ -41,6 +41,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 FORMS += \
     AnalyticsPage.ui \
+    BudgetsPage.ui \
     CreateAccountPage.ui \
     DashboardPage.ui \
     LoginPage.ui

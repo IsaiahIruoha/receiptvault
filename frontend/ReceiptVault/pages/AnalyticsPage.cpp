@@ -65,7 +65,7 @@ void AnalyticsPage::updateChartData(const QList<QPair<QString, double>> &data)
         slice->setBrush(QBrush(slice->brush().color()));
     }
 
-    // Optionally, adjust the legend
+    // Adjust the legend
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 }

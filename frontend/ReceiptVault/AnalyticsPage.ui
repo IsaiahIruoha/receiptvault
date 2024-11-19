@@ -13,6 +13,11 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget {
+    background-color: white;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="1">
     <widget class="QPushButton" name="button_BackToDashboard">
@@ -36,7 +41,7 @@ QPushButton:pressed {
 </string>
      </property>
      <property name="text">
-      <string>Back To Dashboard</string>
+      <string>Back to Dashboard</string>
      </property>
     </widget>
    </item>

@@ -25,8 +25,6 @@ signals:
 
 private:
     Ui::AnalyticsPage *ui;
-
-    // Additional private members if needed
 };
 
 #endif // ANALYTICSPAGE_H
