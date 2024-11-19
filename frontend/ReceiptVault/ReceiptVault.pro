@@ -44,4 +44,5 @@ FORMS += \
     BudgetsPage.ui \
     CreateAccountPage.ui \
     DashboardPage.ui \
-    LoginPage.ui
+    LoginPage.ui \
+    ReceiptsPage.ui

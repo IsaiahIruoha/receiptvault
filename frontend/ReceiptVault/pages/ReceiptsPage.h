@@ -6,11 +6,16 @@
 #include <QTableWidget>
 #include <QComboBox>
 
+namespace Ui {
+class ReceiptsPage;
+}
+
 class ReceiptsPage : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ReceiptsPage(QWidget *parent = nullptr); // constructor
+    explicit ReceiptsPage(QWidget *parent = nullptr);
+    ~ReceiptsPage();
 
     void addReceipt(const QString &store, const QString &total, const QString &date, int categoryId, int expenseId); // add a receipt to the table
     void loadReceipts(int userId); // load user receipts
@@ -26,14 +31,11 @@ public slots:
     void editSelectedReceipt(); // handles editing a selected receipt
 
 private:
-    QTableWidget *receiptsTable; // table for displaying receipts
-    QPushButton *backToDashboardButton; // button to return to dashboard
-    QPushButton *uploadReceiptButton; // button to upload a receipt
-    QPushButton *editReceiptButton; // button to edit a receipt
-
+    Ui::ReceiptsPage *ui; // Pointer to UI object
     int currentUserId; // stores the user ID
 
-    void setupUI(); // sets up the UI
+    void setupUI(); // sets up the UI (if needed)
+    void refreshReceiptsTable(); // refreshes the table
 };
 
-#endif
+#endif // RECEIPTSPAGE_H
