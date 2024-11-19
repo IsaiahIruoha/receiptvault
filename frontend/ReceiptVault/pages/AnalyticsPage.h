@@ -2,30 +2,31 @@
 #define ANALYTICSPAGE_H
 
 #include <QWidget>
-#include <QPushButton>
 #include <QtCharts/QChartView>
+#include <QPushButton>
 #include <QList>
 #include <QPair>
 
-// handles the charts for users
+namespace Ui {
+class AnalyticsPage;
+}
+
 class AnalyticsPage : public QWidget
 {
     Q_OBJECT
 public:
     explicit AnalyticsPage(QWidget *parent = nullptr);
+    ~AnalyticsPage();
 
-    // updates the chart with new data
     void updateChartData(const QList<QPair<QString, double>> &data);
 
 signals:
     void navigateToDashboard();
 
 private:
-    QChartView *pieChartView; // shows the chart
-    QPushButton *backToDashboardButton; // back button
+    Ui::AnalyticsPage *ui;
 
-    // sets up the ui
-    void setupUI();
+    // Additional private members if needed
 };
 
-#endif
+#endif // ANALYTICSPAGE_H

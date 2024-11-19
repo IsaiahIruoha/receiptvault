@@ -25,4 +25,4 @@ private:
     Ui::DashboardPage *ui; // Pointer to UI object generated from .ui file
 };
 
-#endif // DASHBOARDPAGE_H
+#endif
