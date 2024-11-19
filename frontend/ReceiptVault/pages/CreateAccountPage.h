@@ -2,27 +2,21 @@
 #define CREATEACCOUNTPAGE_H
 
 #include <QWidget>
-#include <QLineEdit>
-#include <QPushButton>
+#include "ui_CreateAccountPage.h"
 
 class CreateAccountPage : public QWidget
 {
     Q_OBJECT
 public:
     explicit CreateAccountPage(QWidget *parent = nullptr);
+    ~CreateAccountPage();
 
 signals:
-    void accountCreationRequested(const QString &username, const QString &password); // signal for account creation
-    void navigateToLogin(); // signal to navigate back to login
+    void accountCreationRequested(const QString &username, const QString &password);
+    void navigateToLogin();
 
 private:
-    QLineEdit *createUsernameEdit; // input for username
-    QLineEdit *createPasswordEdit; // input for password
-    QLineEdit *createConfirmPasswordEdit; // input to confirm password
-    QPushButton *createAccountButton; // button to create account
-    QPushButton *toLoginButton; // button to go to login page
-
-    void setupUI(); // sets up the ui
+    Ui::CreateAccountPage *ui;
 };
 
 #endif

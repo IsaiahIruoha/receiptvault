@@ -2,7 +2,7 @@
 #define LOGINPAGE_H
 
 #include <QWidget>
-#include "ui_LoginPage.h" // Include the generated UI header
+#include "ui_LoginPage.h"
 
 class LoginPage : public QWidget
 {
@@ -16,7 +16,7 @@ signals:
     void navigateToCreateAccount(); // signal to go to account creation page
 
 private:
-    Ui::LoginPage *ui; // Pointer to the generated UI class
+    Ui::LoginPage *ui;
 };
 
-#endif // LOGINPAGE_H
+#endif
