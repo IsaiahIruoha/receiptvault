@@ -34,8 +34,7 @@ private:
     Ui::ReceiptsPage *ui; // Pointer to UI object
     int currentUserId; // stores the user ID
 
-    void setupUI(); // sets up the UI (if needed)
     void refreshReceiptsTable(); // refreshes the table
 };
 
-#endif // RECEIPTSPAGE_H
+#endif

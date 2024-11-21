@@ -25,7 +25,7 @@ HEADERS += mainwindow.h \
            pages/BudgetsPage.h
 
 # Resource Files
-RESOURCES += resources.qrc
+RESOURCES +=
 
 # Translation Files
 TRANSLATIONS += ReceiptVault_en_CA.ts

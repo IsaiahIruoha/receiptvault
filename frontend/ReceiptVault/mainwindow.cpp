@@ -14,8 +14,6 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QHeaderView>
-#include <QMenuBar>
-#include <QMenu>
 #include "pages/DatabaseManager.h"
 #include <QCryptographicHash>
 #include <QInputDialog>
@@ -51,26 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
     analyticsPage = new AnalyticsPage(this);
     budgetsPage = new BudgetsPage(this);
 
-    // create a QMenuBar and a QMenu for Dark Mode
-    QMenuBar* menuBar = new QMenuBar();
-    QMenu* settingsMenu = menuBar->addMenu("Settings");
-
-    // create a checkbox action for Dark Mode and initialize to light
-    QAction* darkModeAction = new QAction("Dark Mode");
-    darkModeAction->setCheckable(true);
-    darkModeAction->setChecked(false);  // default is light mode
-    toggleDarkMode = false;
-
-    // connect the action to toggle function
-    connect(darkModeAction, &QAction::toggled, this, &MainWindow::toggleTheme);
-
-    // add the action to the settings menu
-    settingsMenu->addAction(darkModeAction);
-
-    // set the menu bar for the window
-    setMenuBar(menuBar);
-
-
     // add all the pages to the stacked widget
     stackedWidget->addWidget(loginPage);
     stackedWidget->addWidget(createAccountPage);
@@ -81,9 +59,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // display the login page first
     stackedWidget->setCurrentWidget(loginPage);
-
-    // apply external styles
-    applyStyles(toggleDarkMode);
 
     // navigate to CreateAccountPage
     connect(loginPage, &LoginPage::navigateToCreateAccount, [this]() {
@@ -132,8 +107,6 @@ MainWindow::MainWindow(QWidget *parent)
         stackedWidget->setCurrentWidget(loginPage);
     });
 
-
-
     // connect signals for ReceiptsPage
     connect(receiptsPage, &ReceiptsPage::navigateToDashboard, this, &MainWindow::navigateToDashboard);
     connect(receiptsPage, &ReceiptsPage::uploadReceipt, this, &MainWindow::handleUploadReceipt);
@@ -144,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(receiptsPage, &ReceiptsPage::editReceipt, this, &MainWindow::handleEditReceipt);
 
+    this->setStyleSheet("background-color: #FFFFFF; color: #000000;");
 }
 
 
@@ -151,78 +125,6 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
 }
-
-// function to apply external styles to the application
-void MainWindow::applyStyles(bool darkMode)
-{
-    // load the external stylesheet from resources
-    QFile styleFile; // Path to the style.qss in resources
-
-    if (darkMode) {
-        styleFile.setFileName(":/styles/styleDark.qss");  // path to dark theme stylesheet
-    } else {
-        styleFile.setFileName(":/styles/style.qss");  // path to light theme stylesheet
-    }
-
-    qDebug() << "Loading stylesheet from:" << styleFile.fileName();
-
-    if (styleFile.open(QFile::ReadOnly)) {
-        // read the stylesheet content
-        QString style = QLatin1String(styleFile.readAll());
-        // apply the stylesheet to the global app
-        qApp->setStyleSheet(style);
-        // close the file
-        styleFile.close();
-        // print a debug message indicating successful loading
-        qDebug() << (darkMode ? "Dark mode" : "Light mode") << "stylesheet loaded successfully.";
-    } else {
-        // print a debug message if the stylesheet failed to load
-        qDebug() << "Failed to load style.qss";
-    }
-}
-
-void MainWindow::toggleTheme() {
-    toggleDarkMode = !toggleDarkMode;
-
-    if (toggleDarkMode) {
-        clearInlineStyles(this); // clear inline styles for dark mode
-        applyStyles(true);       // apply dark mode stylesheet
-    } else {
-        restoreInlineStyles(this); // restore original styles for light mode
-        applyStyles(false);        // apply light mode stylesheet
-    }
-}
-
-void MainWindow::clearInlineStyles(QWidget* widget) {
-    // save the current style if it's not already stored
-    if (!originalStyles.contains(widget)) {
-        originalStyles[widget] = widget->styleSheet();
-    }
-
-    widget->setStyleSheet(""); // clear inline style for this widget
-
-    // recursively clear child widgets
-    for (auto child : widget->children()) {
-        if (QWidget* childWidget = qobject_cast<QWidget*>(child)) {
-            clearInlineStyles(childWidget);
-        }
-    }
-}
-
-void MainWindow::restoreInlineStyles(QWidget* widget) {
-    if (originalStyles.contains(widget)) {
-        widget->setStyleSheet(originalStyles[widget]); // restore original style from relevant ui file
-    }
-
-    // recursively restore child widgets
-    for (auto child : widget->children()) {
-        if (QWidget* childWidget = qobject_cast<QWidget*>(child)) {
-            restoreInlineStyles(childWidget);
-        }
-    }
-}
-
-
 
 // function to navigate back to the dashboard
 void MainWindow::navigateToDashboard()
@@ -237,6 +139,7 @@ void MainWindow::navigateToLogin()
     // set the current widget to the login page
     stackedWidget->setCurrentWidget(loginPage);
 }
+
 
 // function to handle receipt upload
 void MainWindow::handleUploadReceipt()
@@ -407,8 +310,6 @@ void MainWindow::handleLogin(const QString &username, const QString &password)
     bool verified = DatabaseManager::instance().verifyUser(username, hashedPassword);
 
     if (verified) {
-        // successful login
-        QMessageBox::information(this, "Success", "Login successful!");
         currentUsername = username;
 
         // retrieve and store user ID
