@@ -5,6 +5,7 @@
 #include <QString>
 #include <QList>
 #include <QPair>
+#include <QMap>
 
 class DatabaseManager
 {
@@ -27,6 +28,14 @@ public:
     QList<QPair<QString, double>> getCategoryExpenses(int userId); // gets expense totals by category
     QList<QPair<int, QString>> getAllCategories(); // fetches all categories
 
+    // Dashboard-related methods
+    int getTotalReceipts(int userId); // gets total number of receipts
+    double getTotalSpending(int userId); // gets total spending amount
+
+    // Dashboard-related methods
+    QString getTopSpendingCategory(int userId); // gets the top spending category
+    double getAverageMonthlySpending(int userId); // gets average monthly spending
+
 private:
     DatabaseManager(); // private constructor
     ~DatabaseManager(); // private destructor
@@ -38,4 +47,4 @@ private:
     QSqlDatabase db; // the database instance
 };
 
-#endif
+#endif // DATABASEMANAGER_H

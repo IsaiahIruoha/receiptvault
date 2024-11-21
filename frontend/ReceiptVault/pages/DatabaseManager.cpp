@@ -2,21 +2,22 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
+#include <QCryptographicHash>
 
-// access the singleton instance
+// Access the singleton instance
 DatabaseManager& DatabaseManager::instance()
 {
     static DatabaseManager instance;
     return instance;
 }
 
-// private constructor initializes the QSqlDatabase instance
+// Private constructor initializes the QSqlDatabase instance
 DatabaseManager::DatabaseManager()
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
 }
 
-// destructor closes the database connection if open
+// Destructor closes the database connection if open
 DatabaseManager::~DatabaseManager()
 {
     if (db.isOpen()) {
@@ -24,7 +25,7 @@ DatabaseManager::~DatabaseManager()
     }
 }
 
-// opens the database connection and creates tables if they do not exist
+// Opens the database connection and creates tables if they do not exist
 bool DatabaseManager::openDatabase(const QString &databasePath)
 {
     db.setDatabaseName(databasePath);
@@ -34,22 +35,22 @@ bool DatabaseManager::openDatabase(const QString &databasePath)
         return false;
     } else {
         qDebug() << "Connected to the SQLite database successfully!";
-        return createTables(); // create tables if the database opened successfully
+        return createTables(); // Create tables if the database opened successfully
     }
 }
 
-// getter for QSqlDatabase instance
+// Getter for QSqlDatabase instance
 QSqlDatabase& DatabaseManager::getDatabase()
 {
     return db;
 }
 
-// creates necessary tables if they do not exist (if no existing database)
+// Creates necessary tables if they do not exist (if no existing database)
 bool DatabaseManager::createTables()
 {
     QSqlQuery query(db);
 
-    // create the users table with salt
+    // Create the users table with salt
     QString createUsersTable = R"(
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,7 +64,7 @@ bool DatabaseManager::createTables()
         return false;
     }
 
-    // create the expense_category table
+    // Create the expense_category table
     QString createCategoryTable = R"(
         CREATE TABLE IF NOT EXISTS expense_category (
             category_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -75,7 +76,7 @@ bool DatabaseManager::createTables()
         return false;
     }
 
-    // create the expenses table
+    // Create the expenses table
     QString createExpensesTable = R"(
         CREATE TABLE IF NOT EXISTS expenses (
             expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,7 +96,7 @@ bool DatabaseManager::createTables()
         return false;
     }
 
-    // create the budgets table
+    // Create the budgets table
     QString createBudgetsTable = R"(
     CREATE TABLE IF NOT EXISTS budgets (
         budget_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,7 +114,7 @@ bool DatabaseManager::createTables()
         return false;
     }
 
-    // check if expense_category table is empty
+    // Check if expense_category table is empty
     QString checkCategories = "SELECT COUNT(*) FROM expense_category";
     if (query.exec(checkCategories) && query.next()) {
         int count = query.value(0).toInt();
@@ -129,7 +130,7 @@ bool DatabaseManager::createTables()
     return true;
 }
 
-// user related methods
+// User-related methods
 
 bool DatabaseManager::createUser(const QString &username, const QString &hashedPassword, const QString &salt)
 {
@@ -141,6 +142,56 @@ bool DatabaseManager::createUser(const QString &username, const QString &hashedP
 
     if (!query.exec()) {
         qDebug() << "Error creating user:" << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
+bool DatabaseManager::verifyUser(const QString &username, const QString &hashedPassword)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM users WHERE username = :username AND password = :password");
+    query.bindValue(":username", username);
+    query.bindValue(":password", hashedPassword);
+
+    if (!query.exec()) {
+        qDebug() << "Error verifying user:" << query.lastError().text();
+        return false;
+    }
+
+    return query.next(); // Returns true if a record is found
+}
+
+bool DatabaseManager::getUserCredentials(const QString &username, QString &hashedPassword, QString &salt)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT password, salt FROM users WHERE username = :username");
+    query.bindValue(":username", username);
+
+    if (!query.exec()) {
+        qDebug() << "Error fetching user credentials:" << query.lastError().text();
+        return false;
+    }
+
+    if (query.next()) {
+        hashedPassword = query.value("password").toString();
+        salt = query.value("salt").toString();
+        return true;
+    } else {
+        return false; // User not found
+    }
+}
+
+// Category-related methods
+
+bool DatabaseManager::addCategory(const QString &categoryName)
+{
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO expense_category (category_name) VALUES (:category_name)");
+    query.bindValue(":category_name", categoryName);
+
+    if (!query.exec()) {
+        qDebug() << "Error adding category:" << query.lastError().text();
         return false;
     }
     return true;
@@ -163,58 +214,8 @@ QList<QPair<int, QString>> DatabaseManager::getAllCategories()
     return categories;
 }
 
+// Expense-related methods
 
-bool DatabaseManager::verifyUser(const QString &username, const QString &hashedPassword)
-{
-    QSqlQuery query(db);
-    query.prepare("SELECT * FROM users WHERE username = :username AND password = :password");
-    query.bindValue(":username", username);
-    query.bindValue(":password", hashedPassword);
-
-    if (!query.exec()) {
-        qDebug() << "Error verifying user:" << query.lastError().text();
-        return false;
-    }
-
-    return query.next(); // returns true if a record is found
-}
-
-bool DatabaseManager::getUserCredentials(const QString &username, QString &hashedPassword, QString &salt)
-{
-    QSqlQuery query(db);
-    query.prepare("SELECT password, salt FROM users WHERE username = :username");
-    query.bindValue(":username", username);
-
-    if (!query.exec()) {
-        qDebug() << "Error fetching user credentials:" << query.lastError().text();
-        return false;
-    }
-
-    if (query.next()) {
-        hashedPassword = query.value("password").toString();
-        salt = query.value("salt").toString();
-        return true;
-    } else {
-        return false; // user not found
-    }
-}
-
-// category related methods
-
-bool DatabaseManager::addCategory(const QString &categoryName)
-{
-    QSqlQuery query(db);
-    query.prepare("INSERT INTO expense_category (category_name) VALUES (:category_name)");
-    query.bindValue(":category_name", categoryName);
-
-    if (!query.exec()) {
-        qDebug() << "Error adding category:" << query.lastError().text();
-        return false;
-    }
-    return true;
-}
-
-// adds an expense to the expenses table
 bool DatabaseManager::addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description)
 {
     QSqlQuery query(db);
@@ -257,4 +258,80 @@ QList<QPair<QString, double>> DatabaseManager::getCategoryExpenses(int userId)
         qDebug() << "Error retrieving category expenses:" << query.lastError().text();
     }
     return results;
+}
+
+// Dashboard-related methods
+
+int DatabaseManager::getTotalReceipts(int userId)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT COUNT(*) FROM expenses WHERE user_id = :user_id");
+    query.bindValue(":user_id", userId);
+
+    if (query.exec()) {
+        if (query.next()) {
+            return query.value(0).toInt();
+        }
+    } else {
+        qDebug() << "Error fetching total receipts:" << query.lastError().text();
+    }
+
+    return 0; // Return 0 if query fails
+}
+
+double DatabaseManager::getTotalSpending(int userId)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT SUM(expense_amount) FROM expenses WHERE user_id = :user_id");
+    query.bindValue(":user_id", userId);
+
+    if (query.exec()) {
+        if (query.next()) {
+            return query.value(0).toDouble();
+        }
+    } else {
+        qDebug() << "Error fetching total spending:" << query.lastError().text();
+    }
+
+    return 0.0; // Return 0.0 if query fails
+}
+
+// method to get the top spending category
+QString DatabaseManager::getTopSpendingCategory(int userId) {
+    QSqlQuery query(db);
+    query.prepare(R"(
+        SELECT expense_category.category_name, SUM(expenses.expense_amount) AS total
+        FROM expenses
+        JOIN expense_category ON expenses.category_id = expense_category.category_id
+        WHERE expenses.user_id = :user_id
+        GROUP BY expense_category.category_name
+        ORDER BY total DESC
+        LIMIT 1
+    )");
+    query.bindValue(":user_id", userId);
+
+    if (query.exec() && query.next()) {
+        QString category = query.value(0).toString();
+        double total = query.value(1).toDouble();
+        return QString("%1 ($%2)").arg(category).arg(total, 0, 'f', 2);
+    }
+
+    return "No data available";
+}
+
+// method to get average monthly spending
+double DatabaseManager::getAverageMonthlySpending(int userId) {
+    QSqlQuery query(db);
+    query.prepare(R"(
+        SELECT SUM(expense_amount) / NULLIF(COUNT(DISTINCT strftime('%Y-%m', expense_date)), 0)
+        FROM expenses
+        WHERE user_id = :user_id
+    )");
+    query.bindValue(":user_id", userId);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toDouble();
+    }
+
+    return 0.0; // Default if no data available
 }

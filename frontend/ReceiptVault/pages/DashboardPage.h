@@ -2,7 +2,9 @@
 #define DASHBOARDPAGE_H
 
 #include <QWidget>
-#include "ui_DashboardPage.h" // include the generated UI header
+#include <QtCharts/QChartView>
+#include <QLabel>
+#include <QPushButton>
 
 namespace Ui {
 class DashboardPage;
@@ -15,14 +17,28 @@ public:
     explicit DashboardPage(QWidget *parent = nullptr);
     ~DashboardPage(); // Destructor to clean up
 
+    // Method to update dashboard information
+    void updateDashboard(int totalReceipts, double totalSpending,double avgMonthlySpending, QString topCategory, const QList<QPair<QString, double>> &spendingData);
+
 signals:
-    void navigateToReceipts(); // signal to go to receipts page
-    void navigateToAnalytics(); // signal to go to analytics page
-    void navigateToBudgets(); // signal to go to budgets page
-    void logoutRequested(); // signal for logout
+    void navigateToReceipts();   // Signal to go to receipts page
+    void navigateToAnalytics();  // Signal to go to analytics page
+    void navigateToBudgets();    // Signal to go to budgets page
+    void logoutRequested();      // Signal for logout
 
 private:
     Ui::DashboardPage *ui; // Pointer to UI object generated from .ui file
+
+    // New method to update spending frequency heatmap
+    void updateSpendingFrequencyHeatmap();
+
+    // Current User ID
+    int currentUserId;
+
+public:
+    // Setter for currentUserId
+    void setCurrentUserId(int userId) { currentUserId = userId; }
+
 };
 
-#endif
+#endif // DASHBOARDPAGE_H

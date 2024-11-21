@@ -126,10 +126,18 @@ MainWindow::~MainWindow()
 {
 }
 
-// function to navigate back to the dashboard
 void MainWindow::navigateToDashboard()
 {
-    // set the current widget to the dashboard page
+    int totalReceipts = DatabaseManager::instance().getTotalReceipts(currentUserId);
+    double totalSpending = DatabaseManager::instance().getTotalSpending(currentUserId);
+    QList<QPair<QString, double>> spendingData = DatabaseManager::instance().getCategoryExpenses(currentUserId);
+    QString topCategory = DatabaseManager::instance().getTopSpendingCategory(currentUserId);
+    double avgMonthlySpending = DatabaseManager::instance().getAverageMonthlySpending(currentUserId);
+
+    // Update the dashboard
+    dashboardPage->updateDashboard(totalReceipts, totalSpending, avgMonthlySpending, topCategory, spendingData);
+
+    // Set the current widget to dashboard
     stackedWidget->setCurrentWidget(dashboardPage);
 }
 
@@ -287,13 +295,13 @@ void MainWindow::handleNavigateToAnalytics()
 
 void MainWindow::handleLogin(const QString &username, const QString &password)
 {
-    // check if either the username or password fields are empty
+    // Check if either the username or password fields are empty
     if (username.isEmpty() || password.isEmpty()) {
         QMessageBox::warning(this, "Input Error", "Please enter both username and password.");
         return;
     }
 
-    // fetch stored hashed password and salt
+    // Fetch stored hashed password and salt
     QString storedHashedPassword, storedSalt;
     bool userExists = DatabaseManager::instance().getUserCredentials(username, storedHashedPassword, storedSalt);
 
@@ -302,17 +310,17 @@ void MainWindow::handleLogin(const QString &username, const QString &password)
         return;
     }
 
-    // hash the entered password with the stored salt
+    // Hash the entered password with the stored salt
     QByteArray saltedPassword = password.toUtf8() + storedSalt.toUtf8();
     QByteArray hashedPassword = QCryptographicHash::hash(saltedPassword, QCryptographicHash::Sha256).toHex();
 
-    // verify user
+    // Verify user
     bool verified = DatabaseManager::instance().verifyUser(username, hashedPassword);
 
     if (verified) {
         currentUsername = username;
 
-        // retrieve and store user ID
+        // Retrieve and store user ID
         QSqlQuery query(DatabaseManager::instance().getDatabase());
         query.prepare("SELECT user_id FROM users WHERE username = :username");
         query.bindValue(":username", currentUsername);
@@ -324,6 +332,17 @@ void MainWindow::handleLogin(const QString &username, const QString &password)
             return;
         }
 
+        // Fetch dashboard data
+        int totalReceipts = DatabaseManager::instance().getTotalReceipts(currentUserId);
+        double totalSpending = DatabaseManager::instance().getTotalSpending(currentUserId);
+        QString topCategory = DatabaseManager::instance().getTopSpendingCategory(currentUserId);
+        QList<QPair<QString, double>> spendingData = DatabaseManager::instance().getCategoryExpenses(currentUserId);
+        double avgMonthlySpending = DatabaseManager::instance().getAverageMonthlySpending(currentUserId);
+
+        // Update the dashboard with fetched data
+        dashboardPage->updateDashboard(totalReceipts, totalSpending, avgMonthlySpending, topCategory, spendingData);
+
+        // Switch to the dashboard page
         stackedWidget->setCurrentWidget(dashboardPage);
     } else {
         QMessageBox::warning(this, "Login Failed", "Incorrect username or password.");
