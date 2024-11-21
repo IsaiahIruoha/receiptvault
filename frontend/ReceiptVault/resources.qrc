@@ -2,4 +2,8 @@
     <qresource prefix="/icons">
         <file>ReceiptVault.png</file>
     </qresource>
+    <qresource prefix="/styles">
+        <file>style.qss</file>
+        <file>styleDark.qss</file>
+    </qresource>
 </RCC>

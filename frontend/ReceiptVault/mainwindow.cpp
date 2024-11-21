@@ -20,6 +20,9 @@
 #include <QProcess>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMenuBar>
+#include <QMenu>
+
 
 using namespace Qt;
 
@@ -49,6 +52,26 @@ MainWindow::MainWindow(QWidget *parent)
     analyticsPage = new AnalyticsPage(this);
     budgetsPage = new BudgetsPage(this);
 
+    // create a QMenuBar and a QMenu for Dark Mode
+    QMenuBar* menuBar = new QMenuBar();
+    QMenu* settingsMenu = menuBar->addMenu("Settings");
+
+    // create a checkbox action for Dark Mode and initialize to light
+    QAction* darkModeAction = new QAction("Dark Mode");
+    darkModeAction->setCheckable(true);
+    darkModeAction->setChecked(false);  // default is light mode
+    toggleDarkMode = false;
+
+    // connect the action to toggle function
+    connect(darkModeAction, &QAction::toggled, this, &MainWindow::toggleTheme);
+
+    // add the action to the settings menu
+    settingsMenu->addAction(darkModeAction);
+
+    // set the menu bar for the window
+    setMenuBar(menuBar);
+
+
     // add all the pages to the stacked widget
     stackedWidget->addWidget(loginPage);
     stackedWidget->addWidget(createAccountPage);
@@ -59,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // display the login page first
     stackedWidget->setCurrentWidget(loginPage);
+
+    applyStyles(toggleDarkMode);
 
     // navigate to CreateAccountPage
     connect(loginPage, &LoginPage::navigateToCreateAccount, [this]() {
@@ -120,11 +145,80 @@ MainWindow::MainWindow(QWidget *parent)
     this->setStyleSheet("background-color: #FFFFFF; color: #000000;");
 }
 
+void MainWindow::applyStyles(bool darkMode)
+{
+    // load the external stylesheet from resources
+    QFile styleFile; // Path to the style.qss in resources
+
+    if (darkMode) {
+        styleFile.setFileName(":/styles/styleDark.qss");  // path to dark theme stylesheet
+    } else {
+        styleFile.setFileName(":/styles/style.qss");  // path to light theme stylesheet
+    }
+
+    qDebug() << "Loading stylesheet from:" << styleFile.fileName();
+
+    if (styleFile.open(QFile::ReadOnly)) {
+        // read the stylesheet content
+        QString style = QLatin1String(styleFile.readAll());
+        // close the file
+        styleFile.close();
+        // print a debug message indicating successful loading
+        qDebug() << (darkMode ? "Dark mode" : "Light mode") << "stylesheet loaded successfully.";
+    } else {
+        // print a debug message if the stylesheet failed to load
+        qDebug() << "Failed to load style.qss";
+    }
+}
+
+
 
 // destructor for MainWindow
 MainWindow::~MainWindow()
 {
 }
+
+void MainWindow::toggleTheme() {
+    toggleDarkMode = !toggleDarkMode;
+
+    if (toggleDarkMode) {
+        clearInlineStyles(this); // clear inline styles for dark mode
+        applyStyles(true);       // apply dark mode stylesheet
+    } else {
+        restoreInlineStyles(this); // restore original styles for light mode
+        applyStyles(false);        // apply light mode stylesheet
+    }
+}
+
+void MainWindow::clearInlineStyles(QWidget* widget) {
+    // save the current style if it's not already stored
+    if (!originalStyles.contains(widget)) {
+        originalStyles[widget] = widget->styleSheet();
+    }
+
+    widget->setStyleSheet(""); // clear inline style for this widget
+
+    // recursively clear child widgets
+    for (auto child : widget->children()) {
+        if (QWidget* childWidget = qobject_cast<QWidget*>(child)) {
+            clearInlineStyles(childWidget);
+        }
+    }
+}
+
+void MainWindow::restoreInlineStyles(QWidget* widget) {
+    if (originalStyles.contains(widget)) {
+        widget->setStyleSheet(originalStyles[widget]); // restore original style from relevant ui file
+    }
+
+    // recursively restore child widgets
+    for (auto child : widget->children()) {
+        if (QWidget* childWidget = qobject_cast<QWidget*>(child)) {
+            restoreInlineStyles(childWidget);
+        }
+    }
+}
+
 
 void MainWindow::navigateToDashboard()
 {
