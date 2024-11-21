@@ -27,7 +27,6 @@ signals:
     void navigateToAnalytics();  // Signal to go to analytics page
     void navigateToBudgets();    // Signal to go to budgets page
     void logoutRequested();      // Signal for logout
-    void darkModeToggled(bool);
 
 private:
     // New method to update spending frequency heatmap

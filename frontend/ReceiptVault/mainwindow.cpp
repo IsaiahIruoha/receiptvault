@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     toggleDarkMode = false;
 
     // connect the action to toggle function
+    // Inside MainWindow constructor after creating darkModeAction
     connect(darkModeAction, &QAction::toggled, [this](bool checked) {
         if (isUpdatingTheme) return; // Prevent recursive updates
 
@@ -77,7 +78,9 @@ MainWindow::MainWindow(QWidget *parent)
             applyStyles(false);        // apply light mode stylesheet
         }
 
+        isUpdatingTheme = false; // Reset the flag after applying styles
     });
+
 
     // add the action to the settings menu
     settingsMenu->addAction(darkModeAction);
@@ -93,8 +96,6 @@ MainWindow::MainWindow(QWidget *parent)
     stackedWidget->addWidget(receiptsPage);
     stackedWidget->addWidget(analyticsPage);
     stackedWidget->addWidget(budgetsPage);
-
-    connect(dashboardPage, &DashboardPage::darkModeToggled, this, &MainWindow::toggleTheme);
 
     // display the login page first
     stackedWidget->setCurrentWidget(loginPage);
