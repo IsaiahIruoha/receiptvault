@@ -27,7 +27,47 @@ QPushButton:pressed {
 /* Labels */
 QLabel {
     color: #E0E0E0;
-    font: bold 12px "Arial";
+    font: bold 14px "Arial";
+}
+
+QLabel#titleLabel {
+    color: #E0E0E0;
+    font: bold 35px "Palatino Linotype";
+    text-align: center;
+}
+
+QLabel#appTitle {
+    font-size: 56px;
+    font-weight: bold;
+    color: #E0E0E0;
+    text-align: center;
+    border: none;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+QLabel#label_AnalyticsTitle {
+    color: #E0E0E0;
+    font: bold 35px "Palatino Linotype";
+    padding: 10px;
+    text-align: center;
+}
+
+QLabel#label_BudgetsTitle {
+    color: #E0E0E0;
+    font: bold 35px "Palatino Linotype";
+    padding: 10px;
+}
+
+QLabel#label_CreateAccount {
+    color: #E0E0E0;
+    font: bold 35px "Palatino Linotype";
+    text-align: center;
+}
+
+QLabel#label_ReceiptsTitle {
+    color: #E0E0E0;
+    font: bold 35px "Palatino Linotype";
+    padding: 10px;
 }
 
 /* Line Edits */
