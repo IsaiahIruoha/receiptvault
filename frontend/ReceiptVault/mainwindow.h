@@ -53,6 +53,7 @@ private:
 
     // dark mode
     bool toggleDarkMode;
+    bool isUpdatingTheme; // Flag to prevent recursive updates
 
 };
 

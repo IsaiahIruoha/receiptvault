@@ -248,6 +248,48 @@ QPushButton:pressed {
      </item>
     </layout>
    </item>
+   <item row="4" column="0">
+    <widget class="QCheckBox" name="checkbox_DarkMode">
+     <property name="styleSheet">
+      <string notr="true">
+    QCheckBox {
+        spacing: 5px;
+        font-size: 14px;
+        color: #333333;
+        padding: 2px;
+    }
+
+    QCheckBox::indicator {
+        width: 16px;
+        height: 16px;
+    }
+
+    QCheckBox::indicator:unchecked {
+        border: 1px solid #b4b4b4;
+        background-color: #ffffff;
+    }
+
+    QCheckBox::indicator:checked {
+        border: 1px solid #2a82da;
+        background-color: #2a82da;
+    }
+
+    QCheckBox::indicator:unchecked:hover {
+        border: 1px solid #888888;
+        background-color: #f2f2f2;
+    }
+
+    QCheckBox::indicator:checked:hover {
+        border: 1px solid #1a5fb4;
+        background-color: #1a5fb4;
+    }
+</string>
+     </property>
+     <property name="text">
+      <string>Dark Mode</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

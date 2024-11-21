@@ -15,6 +15,7 @@
 #include <QtCharts/QChartView>
 #include <QHeaderView>
 #include "pages/DatabaseManager.h"
+#include "ui_DashboardPage.h"
 #include <QCryptographicHash>
 #include <QInputDialog>
 #include <QProcess>
@@ -28,7 +29,7 @@ using namespace Qt;
 
 // constructor for MainWindow
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), isUpdatingTheme(false)
 {
     // use DatabaseManager to open the database
     if (!DatabaseManager::instance().openDatabase("../../../../../../../backend/db/receiptvault.db")) {
@@ -63,7 +64,24 @@ MainWindow::MainWindow(QWidget *parent)
     toggleDarkMode = false;
 
     // connect the action to toggle function
-    connect(darkModeAction, &QAction::toggled, this, &MainWindow::toggleTheme);
+    connect(darkModeAction, &QAction::toggled, [this](bool checked) {
+        if (isUpdatingTheme) return; // Prevent recursive updates
+
+        toggleDarkMode = checked;
+        isUpdatingTheme = true;
+
+        if (toggleDarkMode) {
+            clearInlineStyles(this); // clear inline styles for dark mode
+            applyStyles(true);       // apply dark mode stylesheet
+        } else {
+            restoreInlineStyles(this); // restore original styles for light mode
+            applyStyles(false);        // apply light mode stylesheet
+        }
+
+        // Update the checkbox on the DashboardPage to reflect the current theme
+        dashboardPage->ui->checkbox_DarkMode->setChecked(toggleDarkMode);
+        isUpdatingTheme = false;
+    });
 
     // add the action to the settings menu
     settingsMenu->addAction(darkModeAction);
@@ -79,6 +97,8 @@ MainWindow::MainWindow(QWidget *parent)
     stackedWidget->addWidget(receiptsPage);
     stackedWidget->addWidget(analyticsPage);
     stackedWidget->addWidget(budgetsPage);
+
+    connect(dashboardPage, &DashboardPage::darkModeToggled, this, &MainWindow::toggleTheme);
 
     // display the login page first
     stackedWidget->setCurrentWidget(loginPage);
@@ -148,12 +168,12 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::applyStyles(bool darkMode)
 {
     // load the external stylesheet from resources
-    QFile styleFile; // Path to the style.qss in resources
+    QFile styleFile;
 
     if (darkMode) {
         styleFile.setFileName(":/styles/styleDark.qss");  // path to dark theme stylesheet
     } else {
-        styleFile.setFileName(":/styles/style.qss");  // path to light theme stylesheet
+        styleFile.setFileName(":/styles/style.qss");       // path to light theme stylesheet
     }
 
     qDebug() << "Loading stylesheet from:" << styleFile.fileName();
@@ -163,6 +183,8 @@ void MainWindow::applyStyles(bool darkMode)
         QString style = QLatin1String(styleFile.readAll());
         // close the file
         styleFile.close();
+        // apply the stylesheet to the application
+        qApp->setStyleSheet(style);
         // print a debug message indicating successful loading
         qDebug() << (darkMode ? "Dark mode" : "Light mode") << "stylesheet loaded successfully.";
     } else {
@@ -171,15 +193,17 @@ void MainWindow::applyStyles(bool darkMode)
     }
 }
 
-
-
 // destructor for MainWindow
 MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::toggleTheme() {
+void MainWindow::toggleTheme()
+{
+    if (isUpdatingTheme) return; // Prevent recursive updates
+
     toggleDarkMode = !toggleDarkMode;
+    isUpdatingTheme = true;
 
     if (toggleDarkMode) {
         clearInlineStyles(this); // clear inline styles for dark mode
@@ -188,6 +212,11 @@ void MainWindow::toggleTheme() {
         restoreInlineStyles(this); // restore original styles for light mode
         applyStyles(false);        // apply light mode stylesheet
     }
+
+    // Update the checkbox on the DashboardPage to reflect the current theme
+    dashboardPage->ui->checkbox_DarkMode->setChecked(toggleDarkMode);
+
+    isUpdatingTheme = false;
 }
 
 void MainWindow::clearInlineStyles(QWidget* widget) {
@@ -233,6 +262,11 @@ void MainWindow::navigateToDashboard()
 
     // Set the current widget to dashboard
     stackedWidget->setCurrentWidget(dashboardPage);
+
+    // Update the checkbox state without emitting the signal
+    dashboardPage->ui->checkbox_DarkMode->blockSignals(true);
+    dashboardPage->ui->checkbox_DarkMode->setChecked(toggleDarkMode);
+    dashboardPage->ui->checkbox_DarkMode->blockSignals(false);
 }
 
 // function to navigate back to the login page

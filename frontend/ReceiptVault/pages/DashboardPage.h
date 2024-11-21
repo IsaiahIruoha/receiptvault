@@ -20,15 +20,16 @@ public:
     // Method to update dashboard information
     void updateDashboard(int totalReceipts, double totalSpending,double avgMonthlySpending, QString topCategory, const QList<QPair<QString, double>> &spendingData);
 
+    Ui::DashboardPage *ui; // Pointer to UI object generated from .ui file
+
 signals:
     void navigateToReceipts();   // Signal to go to receipts page
     void navigateToAnalytics();  // Signal to go to analytics page
     void navigateToBudgets();    // Signal to go to budgets page
     void logoutRequested();      // Signal for logout
+    void darkModeToggled(bool);
 
 private:
-    Ui::DashboardPage *ui; // Pointer to UI object generated from .ui file
-
     // New method to update spending frequency heatmap
     void updateSpendingFrequencyHeatmap();
 
