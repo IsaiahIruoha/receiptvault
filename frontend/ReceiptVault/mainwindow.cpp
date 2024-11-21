@@ -15,7 +15,6 @@
 #include <QtCharts/QChartView>
 #include <QHeaderView>
 #include "pages/DatabaseManager.h"
-#include "ui_DashboardPage.h"
 #include <QCryptographicHash>
 #include <QInputDialog>
 #include <QProcess>
@@ -78,9 +77,6 @@ MainWindow::MainWindow(QWidget *parent)
             applyStyles(false);        // apply light mode stylesheet
         }
 
-        // Update the checkbox on the DashboardPage to reflect the current theme
-        dashboardPage->ui->checkbox_DarkMode->setChecked(toggleDarkMode);
-        isUpdatingTheme = false;
     });
 
     // add the action to the settings menu
@@ -213,10 +209,6 @@ void MainWindow::toggleTheme()
         applyStyles(false);        // apply light mode stylesheet
     }
 
-    // Update the checkbox on the DashboardPage to reflect the current theme
-    dashboardPage->ui->checkbox_DarkMode->setChecked(toggleDarkMode);
-
-    isUpdatingTheme = false;
 }
 
 void MainWindow::clearInlineStyles(QWidget* widget) {
@@ -263,10 +255,6 @@ void MainWindow::navigateToDashboard()
     // Set the current widget to dashboard
     stackedWidget->setCurrentWidget(dashboardPage);
 
-    // Update the checkbox state without emitting the signal
-    dashboardPage->ui->checkbox_DarkMode->blockSignals(true);
-    dashboardPage->ui->checkbox_DarkMode->setChecked(toggleDarkMode);
-    dashboardPage->ui->checkbox_DarkMode->blockSignals(false);
 }
 
 // function to navigate back to the login page

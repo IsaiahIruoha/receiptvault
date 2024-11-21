@@ -21,7 +21,7 @@ DashboardPage::DashboardPage(QWidget *parent)
     connect(ui->viewBudgetsButton, &QPushButton::clicked, this, &DashboardPage::navigateToBudgets);
     connect(ui->logoutButton, &QPushButton::clicked, this, &DashboardPage::logoutRequested);
 
-    connect(ui->checkbox_DarkMode, &QCheckBox::toggled, this, &DashboardPage::darkModeToggled);
+    //connect(ui->checkbox_DarkMode, &QCheckBox::toggled, this, &DashboardPage::darkModeToggled);
 }
 
 // Destructor
