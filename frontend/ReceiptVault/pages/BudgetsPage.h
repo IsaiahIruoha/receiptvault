@@ -40,4 +40,4 @@ private:
     void refreshBudgetsTable(); // Refreshes the table
 };
 
-#endif // BUDGETSPAGE_H
+#endif

@@ -6,6 +6,7 @@ CONFIG += c++17
 # Source Files
 SOURCES += main.cpp \
            mainwindow.cpp \
+           pages/CategoryManagerDialog.cpp \
            pages/DatabaseManager.cpp \
            pages/LoginPage.cpp \
            pages/CreateAccountPage.cpp \
@@ -16,6 +17,7 @@ SOURCES += main.cpp \
 
 # Header Files
 HEADERS += mainwindow.h \
+           pages/CategoryManagerDialog.h \
            pages/DatabaseManager.h \
            pages/LoginPage.h \
            pages/CreateAccountPage.h \

@@ -22,17 +22,17 @@ public:
 
     // category-related methods
     bool addCategory(const QString &categoryName); // adds a new category
+    bool renameCategory(int categoryId, const QString &newName); // renames a category
+    bool deleteCategory(int categoryId); // deletes a category
+    QList<QPair<int, QString>> getAllCategories(); // fetches all categories
 
     // expense-related methods
     bool addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description); // adds an expense
     QList<QPair<QString, double>> getCategoryExpenses(int userId); // gets expense totals by category
-    QList<QPair<int, QString>> getAllCategories(); // fetches all categories
 
     // Dashboard-related methods
     int getTotalReceipts(int userId); // gets total number of receipts
     double getTotalSpending(int userId); // gets total spending amount
-
-    // Dashboard-related methods
     QString getTopSpendingCategory(int userId); // gets the top spending category
     double getAverageMonthlySpending(int userId); // gets average monthly spending
 
@@ -47,4 +47,4 @@ private:
     QSqlDatabase db; // the database instance
 };
 
-#endif // DATABASEMANAGER_H
+#endif

@@ -182,7 +182,7 @@ QComboBox QAbstractItemView {
      </column>
     </widget>
    </item>
-   <item row="0" column="2" colspan="2">
+   <item row="0" column="1" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="button_UploadReceipt">
@@ -212,6 +212,31 @@ QPushButton:pressed {
        </property>
        <property name="text">
         <string>Upload Receipt</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_EditCategories">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: rgb(28, 130, 255);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 20px;
+    font: bold 15px &quot;Arial&quot;;
+}
+
+QPushButton:hover {
+    background-color: rgb(33, 145, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(23, 110, 230);
+}</string>
+       </property>
+       <property name="text">
+        <string>Edit Categories</string>
        </property>
       </widget>
      </item>

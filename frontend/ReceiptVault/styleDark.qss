@@ -70,6 +70,12 @@ QLabel#label_ReceiptsTitle {
     padding: 10px;
 }
 
+QLabel#label_TopCategory, QLabel#label_TotalSpending, QLabel#label_TotalReceipts, QLabel#label_AvgMonthlySpending {
+   border: 2px solid rgb(200, 200, 200);
+   border-radius: 15px;
+}
+
+
 /* Line Edits */
 QLineEdit {
     background-color: #1E1E1E;
@@ -206,3 +212,46 @@ QScrollBar::add-line, QScrollBar::sub-line {
     width: 0px;
     height: 0px;
 }
+
+#CategoryManagerDialog {
+    background-color: #1E1E1E;
+    border: 2px solid #3E3E3E;
+    border-radius: 10px;
+    color: #FFFFFF;
+    font: 14px "Arial";
+}
+
+#CategoryManagerDialog QLabel {
+    color: #E0E0E0;
+    font: bold 16px "Arial";
+}
+
+#CategoryManagerDialog QLineEdit {
+    background-color: #2A2A2A;
+    color: #FFFFFF;
+    border: 1px solid #3E3E3E;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#CategoryManagerDialog QLineEdit:focus {
+    border: 1px solid #0088FF;
+}
+
+#CategoryManagerDialog QPushButton {
+    background-color: #333333;
+    color: #FFFFFF;
+    border: 1px solid #3E3E3E;
+    border-radius: 5px;
+    font: bold 12px "Arial";
+    padding: 5px 15px;
+}
+
+#CategoryManagerDialog QPushButton:hover {
+    background-color: #444444;
+}
+
+#CategoryManagerDialog QPushButton:pressed {
+    background-color: #555555;
+}
+

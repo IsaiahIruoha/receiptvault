@@ -27,4 +27,4 @@ private:
     Ui::AnalyticsPage *ui;
 };
 
-#endif // ANALYTICSPAGE_H
+#endif

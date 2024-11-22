@@ -41,4 +41,4 @@ public:
 
 };
 
-#endif // DASHBOARDPAGE_H
+#endif

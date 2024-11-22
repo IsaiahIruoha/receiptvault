@@ -197,6 +197,33 @@ bool DatabaseManager::addCategory(const QString &categoryName)
     return true;
 }
 
+bool DatabaseManager::renameCategory(int categoryId, const QString &newName)
+{
+    QSqlQuery query(db);
+    query.prepare("UPDATE expense_category SET category_name = :newName WHERE category_id = :category_id");
+    query.bindValue(":newName", newName);
+    query.bindValue(":category_id", categoryId);
+
+    if (!query.exec()) {
+        qDebug() << "Error renaming category:" << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
+bool DatabaseManager::deleteCategory(int categoryId)
+{
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM expense_category WHERE category_id = :category_id");
+    query.bindValue(":category_id", categoryId);
+
+    if (!query.exec()) {
+        qDebug() << "Error deleting category:" << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
 QList<QPair<int, QString>> DatabaseManager::getAllCategories()
 {
     QList<QPair<int, QString>> categories;

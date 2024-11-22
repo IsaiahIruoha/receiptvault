@@ -1,4 +1,5 @@
 #include "ReceiptsPage.h"
+#include "pages/CategoryManagerDialog.h"
 #include "ui_ReceiptsPage.h" // Include the generated UI header
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -29,6 +30,16 @@ ReceiptsPage::ReceiptsPage(QWidget *parent) :
     connect(ui->button_BackToDashboard, &QPushButton::clicked, this, &ReceiptsPage::navigateToDashboard);
     connect(ui->button_UploadReceipt, &QPushButton::clicked, this, &ReceiptsPage::uploadReceipt);
     connect(ui->button_EditReceipt, &QPushButton::clicked, this, &ReceiptsPage::editSelectedReceipt);
+
+    // Connect the new Edit Categories button
+    connect(ui->button_EditCategories, &QPushButton::clicked, this, [this]() {
+        // Open the Category Manager Dialog
+        CategoryManagerDialog dialog(this);
+        if (dialog.exec() == QDialog::Accepted) {
+            // Refresh the receipts table to update category combo boxes
+            loadReceipts(currentUserId);
+        }
+    });
 }
 
 // Destructor
@@ -54,7 +65,7 @@ void ReceiptsPage::addReceipt(const QString &store, const QString &total, const 
 
     // Store column
     QTableWidgetItem *storeItem = new QTableWidgetItem(store);
-    storeItem->setData(Qt::UserRole, expenseId); // stores expense ID
+    storeItem->setData(Qt::UserRole, expenseId); // Stores expense ID
     ui->table_Receipts->setItem(currentRow, 0, storeItem);
 
     // Total column
@@ -96,15 +107,15 @@ void ReceiptsPage::addReceipt(const QString &store, const QString &total, const 
         }
     });
 
-    ui->table_Receipts->setCellWidget(currentRow, 3, categoryComboBox); // adds the dropdown
+    ui->table_Receipts->setCellWidget(currentRow, 3, categoryComboBox); // Adds the dropdown
 }
 
 // Loads receipts for the current user
 void ReceiptsPage::loadReceipts(int userId)
 {
-    ui->table_Receipts->setRowCount(0); // clears table
+    ui->table_Receipts->setRowCount(0); // Clears table
 
-    currentUserId = userId; // store user ID
+    currentUserId = userId; // Store user ID
 
     QSqlQuery query(DatabaseManager::instance().getDatabase());
     query.prepare("SELECT expense_id, store, expense_amount, expense_date, category_id FROM expenses WHERE user_id = :user_id");
@@ -119,7 +130,7 @@ void ReceiptsPage::loadReceipts(int userId)
             QString date = query.value("expense_date").toString();
             int categoryId = query.value("category_id").toInt();
 
-            addReceipt(store, total, date, categoryId, expenseId); // adds receipt to table
+            addReceipt(store, total, date, categoryId, expenseId); // Adds receipt to table
         }
     } else {
         qDebug() << "Error loading receipts:" << query.lastError().text();
