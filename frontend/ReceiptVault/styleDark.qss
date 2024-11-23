@@ -122,12 +122,22 @@ QCheckBox::indicator:checked:hover {
 }
 
 /* Table Widgets */
+
 QTableWidget {
     background-color: #1E1E1E;
     color: #E0E0E0;
     border: 1px solid #3E3E3E;
+    border-radius: 10px;
     gridline-color: #444444;
-    font: 12px "Arial";
+    font: 14px "Arial";
+}
+
+QHeaderView::section {
+    background-color: #0F0F0F;
+    color: white;
+    font: bold 14px "Arial";
+    padding: 4px;
+    border: 1px solid #373737;
 }
 
 QTableWidget::item {
