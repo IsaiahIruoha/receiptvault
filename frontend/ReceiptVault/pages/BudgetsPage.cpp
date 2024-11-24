@@ -10,6 +10,8 @@
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QDebug>
+#include <QBrush>
+#include <QColor>
 #include "DatabaseManager.h"
 
 // Constructor
@@ -33,7 +35,7 @@ BudgetsPage::~BudgetsPage()
     delete ui;
 }
 
-// Loads budgets from the database for the user
+// loads budgets from the database for the user
 void BudgetsPage::loadBudgets(int userId)
 {
     currentUserId = userId;
@@ -43,6 +45,7 @@ void BudgetsPage::loadBudgets(int userId)
     query.prepare(R"(
         SELECT
             budgets.budget_id,
+            expense_category.category_id,
             expense_category.category_name,
             budgets.budget_amount,
             budgets.start_date,
@@ -57,17 +60,58 @@ void BudgetsPage::loadBudgets(int userId)
         while (query.next()) {
             int budgetId = query.value("budget_id").toInt();
             QString category = query.value("category_name").toString();
-            double amount = query.value("budget_amount").toDouble();
+            double budgetAmount = query.value("budget_amount").toDouble();
             QString startDate = query.value("start_date").toString();
             QString endDate = query.value("end_date").toString();
+            int categoryId = query.value("category_id").toInt();
 
+            // grab total spending for this category and period
+            double totalSpending = DatabaseManager::instance().getSpendingForCategoryInPeriod(userId, categoryId, startDate, endDate);
+
+            // determine status
+            QString statusText;
+            QColor statusColor;
+
+            double percentage = (totalSpending / budgetAmount) * 100.0;
+
+            if (percentage <= 80.0) {
+                statusText = "On Track";
+                statusColor = QColor("#4CAF50"); // Green
+            }
+            else if (percentage <= 100.0) {
+                statusText = "Caution";
+                statusColor = QColor("#FFC107"); // Yellow
+            }
+            else {
+                statusText = "Exceeded";
+                statusColor = QColor("#F44336"); // Red
+            }
+
+            // Insert a new row
             int currentRow = ui->table_Budgets->rowCount();
             ui->table_Budgets->insertRow(currentRow);
+
+            // Budget ID
             ui->table_Budgets->setItem(currentRow, 0, new QTableWidgetItem(QString::number(budgetId)));
+
+            // Category
             ui->table_Budgets->setItem(currentRow, 1, new QTableWidgetItem(category));
-            ui->table_Budgets->setItem(currentRow, 2, new QTableWidgetItem(QString::number(amount, 'f', 2)));
+
+            // Amount
+            ui->table_Budgets->setItem(currentRow, 2, new QTableWidgetItem(QString::number(budgetAmount, 'f', 2)));
+
+            // Start Date
             ui->table_Budgets->setItem(currentRow, 3, new QTableWidgetItem(startDate));
+
+            // End Date
             ui->table_Budgets->setItem(currentRow, 4, new QTableWidgetItem(endDate));
+
+            // Status
+            QTableWidgetItem *statusItem = new QTableWidgetItem(statusText);
+            statusItem->setTextAlignment(Qt::AlignCenter);
+            statusItem->setForeground(QBrush(Qt::white));
+            statusItem->setBackground(QBrush(statusColor));
+            ui->table_Budgets->setItem(currentRow, 5, statusItem); // status is in the 6th column, index 5
         }
     } else {
         qDebug() << "Failed to load budgets:" << query.lastError().text();

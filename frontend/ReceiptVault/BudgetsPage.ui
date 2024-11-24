@@ -105,7 +105,7 @@ QComboBox QAbstractItemView {
       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
      <property name="columnCount">
-      <number>5</number>
+      <number>6</number>
      </property>
      <attribute name="horizontalHeaderCascadingSectionResizes">
       <bool>false</bool>
@@ -114,7 +114,7 @@ QComboBox QAbstractItemView {
       <number>19</number>
      </attribute>
      <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>175</number>
+      <number>145</number>
      </attribute>
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
@@ -142,6 +142,11 @@ QComboBox QAbstractItemView {
      <column>
       <property name="text">
        <string>End Date</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Status</string>
       </property>
      </column>
     </widget>

@@ -287,6 +287,35 @@ QList<QPair<QString, double>> DatabaseManager::getCategoryExpenses(int userId)
     return results;
 }
 
+ // budget related items
+
+double DatabaseManager::getSpendingForCategoryInPeriod(int userId, int categoryId, const QString &startDate, const QString &endDate)
+{
+    QSqlQuery query(db);
+    query.prepare(R"(
+        SELECT SUM(expense_amount)
+        FROM expenses
+        WHERE user_id = :user_id
+          AND category_id = :category_id
+          AND expense_date BETWEEN :start_date AND :end_date
+    )");
+    query.bindValue(":user_id", userId);
+    query.bindValue(":category_id", categoryId);
+    query.bindValue(":start_date", startDate);
+    query.bindValue(":end_date", endDate);
+
+    if (query.exec()) {
+        if (query.next()) {
+            return query.value(0).toDouble(); // Returns 0.0 if NULL
+        }
+    } else {
+        qDebug() << "Error fetching spending for category in period:" << query.lastError().text();
+    }
+
+    return 0.0; // Default if query fails
+}
+
+
 // Dashboard-related methods
 
 int DatabaseManager::getTotalReceipts(int userId)

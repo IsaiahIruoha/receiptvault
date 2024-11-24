@@ -30,6 +30,11 @@ public:
     bool addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description); // adds an expense
     QList<QPair<QString, double>> getCategoryExpenses(int userId); // gets expense totals by category
 
+
+    // budget-related methods
+    double getSpendingForCategoryInPeriod(int userId, int categoryId, const QString &startDate, const QString &endDate);
+
+
     // Dashboard-related methods
     int getTotalReceipts(int userId); // gets total number of receipts
     double getTotalSpending(int userId); // gets total spending amount
