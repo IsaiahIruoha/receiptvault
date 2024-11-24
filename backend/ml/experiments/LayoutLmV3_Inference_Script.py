@@ -15,10 +15,14 @@ import pytesseract
 from pdf2image import convert_from_path
 from PIL import ImageDraw
 
+import warnings
+
+warnings.simplefilter("ignore", category=FutureWarning)
+
 
 
 class ReceiptReader:
-  def __init__(self, path_to_model="model"):
+  def __init__(self, path_to_model="C:\\Users\\Lenovo\\Documents\\GitHub\\Elec376_F24_group7\\backend\\ml\\experiments\\model"):
     self.model = AutoModelForTokenClassification.from_pretrained(path_to_model)
     self.model.eval()
     self.processor = AutoProcessor.from_pretrained(path_to_model, apply_ocr=True)      
@@ -83,7 +87,7 @@ class ReceiptReader:
 #-------------------- ReceiptInformationExtractor --------------------------  
 
 class ReceiptInformationExtractor:
-  def __init__(self, path_to_model="model"):
+  def __init__(self, path_to_model="C:\\Users\\Lenovo\\Documents\\GitHub\\Elec376_F24_group7\\backend\\ml\\experiments\\model"):
     self.receipt_reader = ReceiptReader(path_to_model)
   
   def __call__(self, image):
