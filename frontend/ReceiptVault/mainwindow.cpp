@@ -30,8 +30,10 @@ using namespace Qt;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), isUpdatingTheme(false)
 {
+
+
     // use DatabaseManager to open the database
-    if (!DatabaseManager::instance().openDatabase("../../../../../../../backend/db/receiptvault.db")) {
+    if (!DatabaseManager::instance().openDatabase("C:/Users/Lenovo/Documents/GitHub/Elec376_F24_group7/backend/db/receiptvault.db")) {
         QMessageBox::critical(this, "Database Connection Error", "Unable to connect to the database.");
         exit(EXIT_FAILURE);
     }
@@ -278,11 +280,11 @@ void MainWindow::handleUploadReceipt()
 
     // open a file dialog to select PDF file
     QString fileName = QFileDialog::getOpenFileName(this, "Select Receipt PDF", "",
-                                                    "Images (*.pdf);;All Files (*)");
+                                                    "Images (*.pdf *.jpg *.jpeg *.png);;All Files (*)");
     if (!fileName.isEmpty()) {
         // define the python executable and script path
         QString pythonExecutable = "python3"; // might need to change to "python" depending on the system
-        QString scriptPath = "/path/to/extract_receipt_info.py"; // UPDATE THIS ONCE PYTHON DONE
+        QString scriptPath = "C:/Users/Lenovo/Documents/GitHub/Elec376_F24_group7/backend/ml/experiments/LayoutLmV3_Inference_Script.py"; // UPDATE THIS ONCE PYTHON DONE
 
         // prepare the process arguments which includes the path the pdf
         QStringList arguments;
@@ -312,6 +314,8 @@ void MainWindow::handleUploadReceipt()
         QString output = pythonProcess.readAllStandardOutput();
         QString errorOutput = pythonProcess.readAllStandardError();
 
+        qDebug() << output;
+
         // check for Python errors
         if (!errorOutput.isEmpty()) {
             QMessageBox::critical(this, "Python Error", errorOutput);
@@ -328,16 +332,25 @@ void MainWindow::handleUploadReceipt()
         }
 
         QJsonObject jsonObj = jsonDoc.object();
-        QString store = jsonObj["store"].toString();
-        double totalAmount = jsonObj["total"].toDouble();
-        QString date = jsonObj["date"].toString();
 
-        // validate extracted data
-        if (store.isEmpty() || totalAmount <= 0.0 || date.isEmpty()) {
-            QMessageBox::critical(this, "Error", "Incomplete data extracted from receipt.");
-            qDebug() << "Incomplete data:" << jsonObj;
-            return;
-        }
+        //Parse store from json
+        QString store = jsonObj["store"].toString();
+
+        //parse total as a double from json
+        QString totalString = jsonObj["total"].toString();
+        totalString.remove('$');
+        double totalAmount = totalString.toDouble();
+
+        //Parse date from json and flip
+        QString date = jsonObj["date"].toString();
+        QStringList dateParts = date.split('-');
+        date = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[0];
+
+
+        qDebug() << jsonObj;
+        qDebug() << store;
+        qDebug() << totalAmount;
+        qDebug() << date;
 
         // assign a default category or allow the user to select
         QComboBox *categoryComboBox = new QComboBox(this);
