@@ -29,7 +29,7 @@ public:
     // expense-related methods
     bool addExpense(int userId, int categoryId, const QString &store, const QString &date, double amount, const QString &description); // adds an expense
     QList<QPair<QString, double>> getCategoryExpenses(int userId); // gets expense totals by category
-
+    QList<QPair<QString, double>> getTopStores(int userId, int limit = 5); // gets top N stores
 
     // budget-related methods
     double getSpendingForCategoryInPeriod(int userId, int categoryId, const QString &startDate, const QString &endDate);
@@ -40,6 +40,7 @@ public:
     double getTotalSpending(int userId); // gets total spending amount
     QString getTopSpendingCategory(int userId); // gets the top spending category
     double getAverageMonthlySpending(int userId); // gets average monthly spending
+    QList<QPair<QString, double>> getMonthlySpending(int userId); // gets spending per month
 
 private:
     DatabaseManager(); // private constructor

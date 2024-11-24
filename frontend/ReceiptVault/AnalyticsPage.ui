@@ -15,45 +15,45 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="1">
-    <widget class="QPushButton" name="button_BackToDashboard">
+    <widget class="QChartView" name="chartView_CategoryComparison" native="true">
      <property name="styleSheet">
-      <string notr="true">QPushButton {
-    background-color: rgb(28, 130, 255);
-    border: none;
+      <string notr="true">QChartView{
+    border: 2px solid rgb(200, 200, 200);
     border-radius: 15px;
-    color: white;
-    padding: 10px 20px;
-    font: bold 15px &quot;Arial&quot;;
-}
-
-QPushButton:hover {
-    background-color: rgb(33, 145, 255);
-}
-
-QPushButton:pressed {
-    background-color: rgb(23, 110, 230);
-}
-</string>
-     </property>
-     <property name="text">
-      <string>Back to Dashboard</string>
+    background-color: white;
+}</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="1" column="0" colspan="2">
+    <widget class="QChartView" name="chartView_MonthlyTrend" native="true">
+     <property name="styleSheet">
+      <string notr="true">QChartView{
+    border: 2px solid rgb(200, 200, 200);
+    border-radius: 15px;
+    background-color: white;
+}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="2">
     <widget class="QChartView" name="chartPlaceholder" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -73,7 +73,18 @@ QPushButton:pressed {
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="2" column="2">
+    <widget class="QChartView" name="chartView_TopStores" native="true">
+     <property name="styleSheet">
+      <string notr="true">QChartView{
+    border: 2px solid rgb(200, 200, 200);
+    border-radius: 15px;
+    background-color: white;
+}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="2">
     <widget class="QLabel" name="label_AnalyticsTitle">
      <property name="styleSheet">
       <string notr="true">QLabel {
@@ -89,6 +100,49 @@ QPushButton:pressed {
       <string>Analytics</string>
      </property>
     </widget>
+   </item>
+   <item row="3" column="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_BackToDashboard">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: rgb(28, 130, 255);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 20px;
+    font: bold 15px &quot;Arial&quot;;
+}
+
+QPushButton:hover {
+    background-color: rgb(33, 145, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(23, 110, 230);
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Back to Dashboard</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

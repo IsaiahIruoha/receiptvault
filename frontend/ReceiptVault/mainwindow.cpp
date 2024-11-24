@@ -413,13 +413,19 @@ void MainWindow::handleNavigateToAnalytics()
         return;
     }
 
-    // fetch category expenses from the database
+    // fetch category expenses
     QList<QPair<QString, double>> categoryExpenses = DatabaseManager::instance().getCategoryExpenses(userId);
 
-    // update the AnalyticsPage with the fetched data
-    analyticsPage->updateChartData(categoryExpenses);
+    // fetch monthly spending
+    QList<QPair<QString, double>> monthlySpending = DatabaseManager::instance().getMonthlySpending(userId);
 
-    // navigate to the AnalyticsPage
+    // fetch top stores by spending
+    QList<QPair<QString, double>> topStores = DatabaseManager::instance().getTopStores(userId, 5); // top 5 stores
+
+    // update the AnalyticsPage with the fetched data
+    analyticsPage->updateChartData(categoryExpenses, monthlySpending, topStores);
+
+    // nav to the analytics
     stackedWidget->setCurrentWidget(analyticsPage);
 }
 

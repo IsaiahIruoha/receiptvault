@@ -182,6 +182,64 @@ bool DatabaseManager::getUserCredentials(const QString &username, QString &hashe
     }
 }
 
+QList<QPair<QString, double>> DatabaseManager::getMonthlySpending(int userId)
+{
+    QList<QPair<QString, double>> monthlySpending;
+    QSqlQuery query(db);
+    query.prepare(R"(
+        SELECT
+            strftime('%Y-%m', expense_date) AS month,
+            SUM(expense_amount) AS total
+        FROM expenses
+        WHERE user_id = :user_id
+        GROUP BY month
+        ORDER BY month ASC
+    )");
+    query.bindValue(":user_id", userId);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString month = query.value("month").toString(); // Format: YYYY-MM
+            double total = query.value("total").toDouble();
+            monthlySpending.append(qMakePair(month, total));
+        }
+    } else {
+        qDebug() << "Error fetching monthly spending:" << query.lastError().text();
+    }
+
+    return monthlySpending;
+}
+
+QList<QPair<QString, double>> DatabaseManager::getTopStores(int userId, int limit)
+{
+    QList<QPair<QString, double>> topStores;
+    QSqlQuery query(db);
+    query.prepare(R"(
+        SELECT
+            store,
+            SUM(expense_amount) AS total
+        FROM expenses
+        WHERE user_id = :user_id
+        GROUP BY store
+        ORDER BY total DESC
+        LIMIT :limit
+    )");
+    query.bindValue(":user_id", userId);
+    query.bindValue(":limit", limit);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString store = query.value("store").toString();
+            double total = query.value("total").toDouble();
+            topStores.append(qMakePair(store, total));
+        }
+    } else {
+        qDebug() << "Error fetching top stores:" << query.lastError().text();
+    }
+
+    return topStores;
+}
+
 // Category-related methods
 
 bool DatabaseManager::addCategory(const QString &categoryName)
