@@ -13,3 +13,5 @@ ml/data/unprocessed/
 __pycache__/
 *.log
 *.env
+
+.DS_Store
