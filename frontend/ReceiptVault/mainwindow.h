@@ -1,60 +1,59 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QStackedWidget>
-#include "pages/LoginPage.h"
-#include "pages/CreateAccountPage.h"
-#include "pages/DashboardPage.h"
-#include "pages/ReceiptsPage.h"
-#include "pages/AnalyticsPage.h"
-#include "pages/BudgetsPage.h"
-#include <QMap>
-#include <QWidget>
-
+#include <QMainWindow> // for main application window
+#include <QStackedWidget> // for managing multiple pages
+#include "pages/LoginPage.h" // login page header
+#include "pages/CreateAccountPage.h" // create account page header
+#include "pages/DashboardPage.h" // dashboard page header
+#include "pages/ReceiptsPage.h" // receipts page header
+#include "pages/AnalyticsPage.h" // analytics page header
+#include "pages/BudgetsPage.h" // budgets page header
+#include <QMap> // for mapping widgets to their styles
+#include <QWidget> // for general widgets
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+    Q_OBJECT // needed for signals and slots
+
 public:
-    explicit MainWindow(QWidget *parent = nullptr); // constructor
-    ~MainWindow(); // destructor
+    explicit MainWindow(QWidget *parent = nullptr); // constructor to set up the main window
+    ~MainWindow(); // destructor to clean up resources
 
 private slots:
-    void handleLogin(const QString &username, const QString &password); // process login
-    void handleCreateAccount(const QString &username, const QString &password); // process account creation
-    void navigateToDashboard(); // switch to dashboard
-    void navigateToLogin(); // switch to login
-    void handleUploadReceipt(); // handle receipt upload
-    void handleNavigateToAnalytics(); // go to analytics
-    void handleEditReceipt(int expenseId); // handle receipt editing
-    void toggleTheme(); // toggle dark/light mode
+    void handleLogin(const QString &username, const QString &password); // handles login functionality
+    void handleCreateAccount(const QString &username, const QString &password); // handles account creation
+    void navigateToDashboard(); // navigates to the dashboard page
+    void navigateToLogin(); // navigates back to the login page
+    void handleUploadReceipt(); // handles receipt upload functionality
+    void handleNavigateToAnalytics(); // navigates to the analytics page
+    void handleEditReceipt(int expenseId); // handles editing of a specific receipt
+    void toggleTheme(); // toggles between light and dark mode
 
 private:
-    QStackedWidget *stackedWidget; // manages the page stack
+    QStackedWidget *stackedWidget; // stack to manage switching between pages
 
     // page instances
-    LoginPage *loginPage;
-    CreateAccountPage *createAccountPage;
-    DashboardPage *dashboardPage;
-    ReceiptsPage *receiptsPage;
-    AnalyticsPage *analyticsPage;
-    BudgetsPage *budgetsPage;
+    LoginPage *loginPage; // login page instance
+    CreateAccountPage *createAccountPage; // create account page instance
+    DashboardPage *dashboardPage; // dashboard page instance
+    ReceiptsPage *receiptsPage; // receipts page instance
+    AnalyticsPage *analyticsPage; // analytics page instance
+    BudgetsPage *budgetsPage; // budgets page instance
 
-    void applyStyles(bool darkMode); // apply external styles
-    void clearInlineStyles(QWidget* widget); // clear styles for dark mode
-    void restoreInlineStyles(QWidget* widget); // restore styles for light mode
-    QMap<QWidget*, QString> originalStyles; // store original styles for light mode
+    void applyStyles(bool darkMode); // applies external styles based on theme
+    void clearInlineStyles(QWidget* widget); // clears inline styles for dark mode
+    void restoreInlineStyles(QWidget* widget); // restores inline styles for light mode
+    QMap<QWidget*, QString> originalStyles; // map to store original widget styles for light mode
 
-    int getCurrentUserId(); // get current user ID
+    int getCurrentUserId(); // gets the current user ID
 
-    QString currentUsername; // store current username
-    int currentUserId; // store current user ID
+    QString currentUsername; // stores the current user's username
+    int currentUserId; // stores the current user's ID
 
-    // dark mode
-    bool toggleDarkMode;
-    bool isUpdatingTheme; // Flag to prevent recursive updates
-
+    // theme management
+    bool toggleDarkMode; // keeps track of current theme mode
+    bool isUpdatingTheme; // prevents recursive updates when switching themes
 };
 
 #endif

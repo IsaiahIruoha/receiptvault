@@ -2,42 +2,42 @@
 #define BUDGETSPAGE_H
 
 #include <QWidget>
-#include <QPushButton>
-#include <QTableWidget>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QDateEdit>
-#include <QFormLayout>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QPushButton> // for buttons
+#include <QTableWidget> // for table display
+#include <QLineEdit> // for input fields
+#include <QComboBox> // for dropdown menus
+#include <QDateEdit> // for date selection
+#include <QFormLayout> // for form layouts
+#include <QVBoxLayout> // for vertical layouts
+#include <QHBoxLayout> // for horizontal layouts
 
 namespace Ui {
-class BudgetsPage;
+class BudgetsPage; // forward declaration of ui class
 }
 
 class BudgetsPage : public QWidget
 {
-    Q_OBJECT
-public:
-    explicit BudgetsPage(QWidget *parent = nullptr);
-    ~BudgetsPage();
+    Q_OBJECT // needed for signals and slots
 
-    // Loads budgets for the user
-    void loadBudgets(int userId);
+public:
+    explicit BudgetsPage(QWidget *parent = nullptr); // constructor to set up the widget
+    ~BudgetsPage(); // destructor to clean up the widget
+
+    void loadBudgets(int userId); // loads budgets for a specific user
 
 signals:
-    void navigateToDashboard();
+    void navigateToDashboard(); // signal to go back to the dashboard
 
 private slots:
-    void addBudget();    // Adds a budget
-    void editBudget();   // Edits a budget
-    void deleteBudget(); // Deletes a budget
+    void addBudget(); // adds a new budget
+    void editBudget(); // edits an existing budget
+    void deleteBudget(); // deletes a budget
 
 private:
-    int currentUserId; // Stores user id
+    int currentUserId; // stores the id of the current user
+    Ui::BudgetsPage *ui; // pointer to ui elements
 
-    Ui::BudgetsPage *ui; // Pointer to UI object
-    void refreshBudgetsTable(); // Refreshes the table
+    void refreshBudgetsTable(); // updates the table to show the latest budgets
 };
 
 #endif

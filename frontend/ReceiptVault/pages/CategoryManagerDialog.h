@@ -1,34 +1,35 @@
 #ifndef CATEGORYMANAGERDIALOG_H
 #define CATEGORYMANAGERDIALOG_H
 
-#include <QDialog>
-#include <QListWidget>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QInputDialog>
-#include <QMessageBox>
-#include "DatabaseManager.h"
+#include <QDialog> // for dialog window
+#include <QListWidget> // for showing list of categories
+#include <QPushButton> // for buttons
+#include <QVBoxLayout> // for vertical layout
+#include <QHBoxLayout> // for horizontal layout
+#include <QInputDialog> // for input dialog
+#include <QMessageBox> // for message boxes
+#include "DatabaseManager.h" // for database operations
 
 class CategoryManagerDialog : public QDialog
 {
-    Q_OBJECT
+    Q_OBJECT // needed for signals and slots
+
 public:
-    explicit CategoryManagerDialog(QWidget *parent = nullptr);
+    explicit CategoryManagerDialog(QWidget *parent = nullptr); // constructor for setting up dialog
 
 private slots:
-    void addCategory();
-    void renameCategory();
-    void deleteCategory();
+    void addCategory(); // adds a new category
+    void renameCategory(); // renames an existing category
+    void deleteCategory(); // deletes a category
 
 private:
-    QListWidget *listWidgetCategories;
-    QPushButton *buttonAdd;
-    QPushButton *buttonRename;
-    QPushButton *buttonDelete;
-    QPushButton *buttonClose;
+    QListWidget *listWidgetCategories; // widget to display list of categories
+    QPushButton *buttonAdd; // button to add category
+    QPushButton *buttonRename; // button to rename category
+    QPushButton *buttonDelete; // button to delete category
+    QPushButton *buttonClose; // button to close the dialog
 
-    void loadCategories();
+    void loadCategories(); // loads categories from database
 };
 
 #endif

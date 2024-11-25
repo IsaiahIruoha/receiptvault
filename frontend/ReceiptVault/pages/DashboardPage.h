@@ -1,44 +1,47 @@
 #ifndef DASHBOARDPAGE_H
 #define DASHBOARDPAGE_H
 
-#include <QWidget>
-#include <QtCharts/QChartView>
-#include <QLabel>
-#include <QPushButton>
+#include <QWidget> // for QWidget base class
+#include <QtCharts/QChartView> // for displaying charts
+#include <QLabel> // for displaying text and information
+#include <QPushButton> // for navigation buttons
 
 namespace Ui {
-class DashboardPage;
+class DashboardPage; // forward declaration of ui class
 }
 
 class DashboardPage : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT // needed for signals and slots
+
 public:
-    explicit DashboardPage(QWidget *parent = nullptr);
-    ~DashboardPage(); // Destructor to clean up
+    explicit DashboardPage(QWidget *parent = nullptr); // constructor to set up the widget
+    ~DashboardPage(); // destructor to clean up resources
 
-    // Method to update dashboard information
-    void updateDashboard(int totalReceipts, double totalSpending,double avgMonthlySpending, QString topCategory, const QList<QPair<QString, double>> &spendingData);
+    // updates the dashboard with user data
+    void updateDashboard(
+        int totalReceipts, // total number of receipts
+        double totalSpending, // total spending amount
+        double avgMonthlySpending, // average monthly spending
+        QString topCategory, // top spending category
+        const QList<QPair<QString, double>> &spendingData // data for spending distribution
+        );
 
-    Ui::DashboardPage *ui; // Pointer to UI object generated from .ui file
+    Ui::DashboardPage *ui; // pointer to ui elements for this page
 
 signals:
-    void navigateToReceipts();   // Signal to go to receipts page
-    void navigateToAnalytics();  // Signal to go to analytics page
-    void navigateToBudgets();    // Signal to go to budgets page
-    void logoutRequested();      // Signal for logout
+    void navigateToReceipts(); // signal to navigate to the receipts page
+    void navigateToAnalytics(); // signal to navigate to the analytics page
+    void navigateToBudgets(); // signal to navigate to the budgets page
+    void logoutRequested(); // signal to log out the user
 
 private:
-    // New method to update spending frequency heatmap
-    void updateSpendingFrequencyHeatmap();
+    void updateSpendingFrequencyHeatmap(); // updates the spending frequency heatmap
 
-    // Current User ID
-    int currentUserId;
+    int currentUserId; // stores the id of the current user
 
 public:
-    // Setter for currentUserId
-    void setCurrentUserId(int userId) { currentUserId = userId; }
-
+    void setCurrentUserId(int userId) { currentUserId = userId; } // sets the current user id
 };
 
 #endif

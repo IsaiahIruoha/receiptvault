@@ -1,40 +1,41 @@
 #ifndef RECEIPTSPAGE_H
 #define RECEIPTSPAGE_H
 
-#include <QWidget>
-#include <QPushButton>
-#include <QTableWidget>
-#include <QComboBox>
+#include <QWidget> // for QWidget base class
+#include <QPushButton> // for buttons
+#include <QTableWidget> // for table display
+#include <QComboBox> // for dropdown menus
 
 namespace Ui {
-class ReceiptsPage;
+class ReceiptsPage; // forward declaration of ui class
 }
 
 class ReceiptsPage : public QWidget
 {
-    Q_OBJECT
-public:
-    explicit ReceiptsPage(QWidget *parent = nullptr);
-    ~ReceiptsPage();
+    Q_OBJECT // needed for signals and slots
 
-    void addReceipt(const QString &store, const QString &total, const QString &date, int categoryId, int expenseId); // add a receipt to the table
-    void loadReceipts(int userId); // load user receipts
-    void setCurrentUserId(int userId); // set the current user ID
-    void populateCategoryComboBox(QComboBox *comboBox); // fill category dropdown
+public:
+    explicit ReceiptsPage(QWidget *parent = nullptr); // constructor to set up the widget
+    ~ReceiptsPage(); // destructor to clean up resources
+
+    void addReceipt(const QString &store, const QString &total, const QString &date, int categoryId, int expenseId); // adds a receipt to the table
+    void loadReceipts(int userId); // loads receipts for the current user
+    void setCurrentUserId(int userId); // sets the current user ID
+    void populateCategoryComboBox(QComboBox *comboBox); // populates category dropdown with available categories
 
 signals:
-    void navigateToDashboard(); // signal to go back to dashboard
-    void uploadReceipt(); // signal to upload a receipt
-    void editReceipt(int expenseId); // signal to edit a receipt
+    void navigateToDashboard(); // signal to go back to the dashboard
+    void uploadReceipt(); // signal to upload a new receipt
+    void editReceipt(int expenseId); // signal to edit a receipt with the given expense ID
 
 public slots:
-    void editSelectedReceipt(); // handles editing a selected receipt
+    void editSelectedReceipt(); // handles editing the selected receipt
 
 private:
-    Ui::ReceiptsPage *ui; // Pointer to UI object
-    int currentUserId; // stores the user ID
+    Ui::ReceiptsPage *ui; // pointer to ui elements for this page
+    int currentUserId; // stores the id of the current user
 
-    void refreshReceiptsTable(); // refreshes the table
+    void refreshReceiptsTable(); // refreshes the receipts table with updated data
 };
 
 #endif

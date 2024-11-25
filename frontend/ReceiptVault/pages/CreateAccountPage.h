@@ -1,22 +1,23 @@
 #ifndef CREATEACCOUNTPAGE_H
 #define CREATEACCOUNTPAGE_H
 
-#include <QWidget>
-#include "ui_CreateAccountPage.h"
+#include <QWidget> // for QWidget base class
+#include "ui_CreateAccountPage.h" // ui header for managing the ui design
 
 class CreateAccountPage : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT // needed for signals and slots
+
 public:
-    explicit CreateAccountPage(QWidget *parent = nullptr);
-    ~CreateAccountPage();
+    explicit CreateAccountPage(QWidget *parent = nullptr); // constructor to set up the widget
+    ~CreateAccountPage(); // destructor to clean up the widget
 
 signals:
-    void accountCreationRequested(const QString &username, const QString &password);
-    void navigateToLogin();
+    void accountCreationRequested(const QString &username, const QString &password); // signal for requesting account creation
+    void navigateToLogin(); // signal to navigate back to the login page
 
 private:
-    Ui::CreateAccountPage *ui;
+    Ui::CreateAccountPage *ui; // pointer to ui elements for this page
 };
 
 #endif
