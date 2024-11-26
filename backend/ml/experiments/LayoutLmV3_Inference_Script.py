@@ -11,8 +11,8 @@ import sys
 import json
 import joblib
 from PIL import Image
-import pytesseract
-from pdf2image import convert_from_path
+import pytesseract #OCR library for text recognition
+from pdf2image import convert_from_path #To convert PDF to image
 from PIL import ImageDraw
 
 import warnings
@@ -20,13 +20,15 @@ import warnings
 warnings.simplefilter("ignore", category=FutureWarning)
 
 
-
+#Handles reading and processing recipt images using the tained model
 class ReceiptReader:
+  #Load pre-trained model 
   def __init__(self, path_to_model="C:\\Users\\Lenovo\\Documents\\GitHub\\Elec376_F24_group7\\backend\\ml\\experiments\\model"):
     self.model = AutoModelForTokenClassification.from_pretrained(path_to_model)
     self.model.eval()
     self.processor = AutoProcessor.from_pretrained(path_to_model, apply_ocr=True)      
 
+  #Process used to extract prediction from a receipt image input.
   def __call__(self, image):
     encodings = self.__get_encodings(image)
     words = self.__get_words(encodings)
@@ -38,13 +40,16 @@ class ReceiptReader:
     response_dict["bboxes"] = [self.__unnormalize_bbox(bbox, image) for bbox in response_dict["bboxes"]]
     return response_dict
   
+  #Tokenize and encode the image for the model
   def __get_encodings(self, image):
     return self.processor(image, return_tensors="pt")
   
+  #Decode the tokenized inputs back to words
   def __get_words(self, encodings):
     words = [self.processor.tokenizer.decode(input_id) for input_id in encodings.input_ids[0]]
     return words
   
+  #Merge tokens that belong to same entity based on bounding boxes
   def __merge_tokens(self, words, bboxes, labels):
     new_words = []
     new_bboxes = []
@@ -143,13 +148,13 @@ def extract_info(file_path, ):
         image = images[0]
     else:
         image = Image.open(file_path).convert("RGB")
-        
-    receipt_info_extractor = ReceiptInformationExtractor()
+    #Use class to read    
+    receipt_info_extractor = ReceiptInformationExtractor() 
     json_result = receipt_info_extractor(image)
 
     return json_result
 
-#----------------------------------------------------------------------------
+#start----------------------------------------------------------------------
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
