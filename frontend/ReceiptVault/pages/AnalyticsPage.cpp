@@ -95,25 +95,32 @@ void AnalyticsPage::updateMonthlyTrend(const QList<QPair<QString, double>> &data
 
     QChart *chart = ui->chartView_MonthlyTrend->chart();
 
-    // clear existing data
+    // Clear existing data
     chart->removeAllSeries();
 
-    // create new line series
+    // **Remove existing axes**
+    QList<QAbstractAxis*> axes = chart->axes();
+    foreach (QAbstractAxis *axis, axes) {
+        chart->removeAxis(axis);
+        delete axis; // Delete the axis to prevent memory leaks
+    }
+
+    // Create new line series
     QLineSeries *lineSeries = new QLineSeries();
     lineSeries->setName("Monthly Spending");
 
     QStringList categories;
     for (const auto &pair : data) {
-        categories.append(pair.first); // add category
+        categories.append(pair.first); // Add category
         lineSeries->append(categories.size(), pair.second); // x-axis index
     }
 
-    // configure chart
+    // Configure chart
     chart->addSeries(lineSeries);
     chart->setTitle("Monthly Spending Trend");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    // create axes
+    // Create axes
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     axisX->append(categories);
     chart->addAxis(axisX, Qt::AlignBottom);
@@ -124,11 +131,11 @@ void AnalyticsPage::updateMonthlyTrend(const QList<QPair<QString, double>> &data
     chart->addAxis(axisY, Qt::AlignLeft);
     lineSeries->attachAxis(axisY);
 
-    // customize line
+    // Customize line
     lineSeries->setPointsVisible(true);
     lineSeries->setPen(QPen(Qt::blue, 2));
 
-    // adjust legend
+    // Adjust legend
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 }
@@ -142,8 +149,15 @@ void AnalyticsPage::updateCategoryComparison(const QList<QPair<QString, double>>
 
     QChart *chart = ui->chartView_CategoryComparison->chart();
 
-    // clear existing data
+    // Clear existing data
     chart->removeAllSeries();
+
+    // clear axis
+    QList<QAbstractAxis*> axes = chart->axes();
+    foreach (QAbstractAxis *axis, axes) {
+        chart->removeAxis(axis);
+        delete axis; // Delete the axis to prevent memory leaks
+    }
 
     // create new bar series
     QBarSeries *barSeries = new QBarSeries();
@@ -191,8 +205,15 @@ void AnalyticsPage::updateTopStores(const QList<QPair<QString, double>> &data)
 
     QChart *chart = ui->chartView_TopStores->chart();
 
-    // clear existing data
+    // Clear existing data
     chart->removeAllSeries();
+
+    // remove axis
+    QList<QAbstractAxis*> axes = chart->axes();
+    foreach (QAbstractAxis *axis, axes) {
+        chart->removeAxis(axis);
+        delete axis; // Delete the axis to prevent memory leaks
+    }
 
     // create new bar series
     QBarSeries *barSeries = new QBarSeries();
