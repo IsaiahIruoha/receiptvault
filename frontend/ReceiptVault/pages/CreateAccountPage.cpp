@@ -1,36 +1,41 @@
 #include "CreateAccountPage.h"
-#include <QMessageBox>
+#include <QMessageBox> // for showing message boxes
 
+// constructor
 CreateAccountPage::CreateAccountPage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CreateAccountPage)
 {
-    ui->setupUi(this);
+    ui->setupUi(this); // set up the UI from the .ui file
 
-    // Connect create account button click
+    // connect create account button to handle account creation
     connect(ui->createAccountButton, &QPushButton::clicked, [this]() {
-        QString username = ui->createUsernameEdit->text().trimmed();
-        QString password = ui->createPasswordEdit->text();
-        QString confirmPassword = ui->createConfirmPasswordEdit->text();
+        QString username = ui->createUsernameEdit->text().trimmed(); // get and trim username input
+        QString password = ui->createPasswordEdit->text(); // get password input
+        QString confirmPassword = ui->createConfirmPasswordEdit->text(); // get confirm password input
 
+        // check if any field is empty
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             QMessageBox::warning(this, "Input Error", "Please fill in all fields.");
             return;
         }
 
+        // check if passwords match
         if (password != confirmPassword) {
             QMessageBox::warning(this, "Input Error", "Passwords do not match.");
             return;
         }
 
+        // emit signal to request account creation
         emit accountCreationRequested(username, password);
     });
 
-    // Connect back to login button click
+    // connect back to login button to navigate to login page
     connect(ui->toLoginButton, &QPushButton::clicked, this, &CreateAccountPage::navigateToLogin);
 }
 
+// destructor
 CreateAccountPage::~CreateAccountPage()
 {
-    delete ui;
+    delete ui; // clean up UI resources
 }

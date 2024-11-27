@@ -1,31 +1,32 @@
 #include "LoginPage.h"
-#include <QMessageBox>
+#include <QMessageBox> // For showing warnings
 
-// Constructor
+// constructor
 LoginPage::LoginPage(QWidget *parent)
-    : QWidget(parent), ui(new Ui::LoginPage) // Initialize the UI pointer
+    : QWidget(parent), ui(new Ui::LoginPage) // initialize the UI pointer
 {
-    ui->setupUi(this); // Sets up the UI from the .ui file
+    ui->setupUi(this); // set up the UI from the .ui file
 
-    // Connect login button signal
+    // connect the login button to handle login requests
     connect(ui->loginButton, &QPushButton::clicked, this, [this]() {
-        QString username = ui->loginUsernameEdit->text().trimmed();
-        QString password = ui->loginPasswordEdit->text();
+        QString username = ui->loginUsernameEdit->text().trimmed(); // get and trim username input
+        QString password = ui->loginPasswordEdit->text(); // get password input
 
+        // check if username or password is empty
         if (username.isEmpty() || password.isEmpty()) {
             QMessageBox::warning(this, "Input Error", "Please enter both username and password.");
-            return;
+            return; // exit if inputs are invalid
         }
 
-        emit loginRequested(username, password); // Emit signal for login (handled in main window)
+        emit loginRequested(username, password); // emit signal for login (handled in main window)
     });
 
-    // Connect create account button signal
+    // connect the create account button to navigate to the create account page
     connect(ui->toCreateAccountButton, &QPushButton::clicked, this, &LoginPage::navigateToCreateAccount);
 }
 
-// Destructor
+// destructor
 LoginPage::~LoginPage()
 {
-    delete ui; // Clean up the UI object
+    delete ui; // clean up the UI object
 }

@@ -1,13 +1,13 @@
 #include "AnalyticsPage.h"
 #include "ui_AnalyticsPage.h"
-#include <QtCharts/QPieSeries>
-#include <QtCharts/QLineSeries>
-#include <QtCharts/QBarSeries>
-#include <QtCharts/QBarSet>
-#include <QtCharts/QChart>
-#include <QtCharts/QBarCategoryAxis>
-#include <QDebug>
-#include <QtCharts/qvalueaxis.h>
+#include <QtCharts/QPieSeries> // for pie chart
+#include <QtCharts/QLineSeries> // for line chart
+#include <QtCharts/QBarSeries> // for bar chart
+#include <QtCharts/QBarSet> // for bar sets
+#include <QtCharts/QChart> // for managing charts
+#include <QtCharts/QBarCategoryAxis> // for bar chart x-axis
+#include <QDebug> // for debugging
+#include <QtCharts/QValueAxis> // for value axis
 
 using namespace Qt;
 
@@ -17,25 +17,25 @@ AnalyticsPage::AnalyticsPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Initialize the Spending Breakdown Pie Chart
+    // initialize spending breakdown pie chart
     updateSpendingBreakdown(QList<QPair<QString, double>>());
 
-    // Initialize the Monthly Spending Trend Line Chart
+    // initialize monthly spending trend line chart
     updateMonthlyTrend(QList<QPair<QString, double>>());
 
-    // Initialize the Category-wise Expense Comparison Bar Chart
+    // initialize category-wise expense comparison bar chart
     updateCategoryComparison(QList<QPair<QString, double>>());
 
-    // Initialize the Top Stores by Spending Bar Chart
+    // initialize top stores by spending bar chart
     updateTopStores(QList<QPair<QString, double>>());
 
-    // Connect back button to signal
+    // connect back button to navigate to dashboard signal
     connect(ui->button_BackToDashboard, &QPushButton::clicked, this, &AnalyticsPage::navigateToDashboard);
 }
 
 AnalyticsPage::~AnalyticsPage()
 {
-    delete ui;
+    delete ui; // clean up ui
 }
 
 void AnalyticsPage::updateChartData(
@@ -44,44 +44,44 @@ void AnalyticsPage::updateChartData(
     const QList<QPair<QString, double>> &topStores
     )
 {
-    updateSpendingBreakdown(categoryExpenses);
-    updateMonthlyTrend(monthlySpending);
-    updateCategoryComparison(categoryExpenses); // Reusing categoryExpenses
-    updateTopStores(topStores);
+    updateSpendingBreakdown(categoryExpenses); // update pie chart
+    updateMonthlyTrend(monthlySpending); // update line chart
+    updateCategoryComparison(categoryExpenses); // update bar chart
+    updateTopStores(topStores); // update top stores chart
 }
 
 void AnalyticsPage::updateSpendingBreakdown(const QList<QPair<QString, double>> &data)
 {
     if (!ui->chartPlaceholder || !ui->chartPlaceholder->chart()) {
-        qDebug() << "Chart view or chart is not initialized.";
+        qDebug() << "chart view or chart is not initialized";
         return;
     }
 
     QChart *chart = ui->chartPlaceholder->chart();
 
-    // Clear existing data
+    // clear existing data
     chart->removeAllSeries();
 
-    // Create and populate a new pie series
+    // create new pie series
     QPieSeries *pieSeries = new QPieSeries();
     pieSeries->setName("Spending Breakdown");
     for (const auto &pair : data) {
         pieSeries->append(pair.first, pair.second);
     }
 
-    // Update the chart with new data
+    // update chart with new series
     chart->addSeries(pieSeries);
     chart->setTitle("Spending Breakdown");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    // Customize pie slices
+    // customize pie slices
     for (auto slice : pieSeries->slices()) {
         slice->setLabelVisible(true);
         slice->setPen(QPen(Qt::white));
         slice->setBrush(QBrush(slice->brush().color()));
     }
 
-    // Adjust the legend
+    // adjust legend
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 }
@@ -89,33 +89,31 @@ void AnalyticsPage::updateSpendingBreakdown(const QList<QPair<QString, double>> 
 void AnalyticsPage::updateMonthlyTrend(const QList<QPair<QString, double>> &data)
 {
     if (!ui->chartView_MonthlyTrend || !ui->chartView_MonthlyTrend->chart()) {
-        qDebug() << "Monthly Trend chart view or chart is not initialized.";
+        qDebug() << "monthly trend chart view or chart is not initialized";
         return;
     }
 
     QChart *chart = ui->chartView_MonthlyTrend->chart();
 
-    // Clear existing data
+    // clear existing data
     chart->removeAllSeries();
 
-    // Create a new line series
+    // create new line series
     QLineSeries *lineSeries = new QLineSeries();
     lineSeries->setName("Monthly Spending");
 
     QStringList categories;
     for (const auto &pair : data) {
-        QString month = pair.first; // Format: YYYY-MM
-        double total = pair.second;
-        categories.append(month);
-        lineSeries->append(categories.size(), total); // X-axis as integer index
+        categories.append(pair.first); // add category
+        lineSeries->append(categories.size(), pair.second); // x-axis index
     }
 
-    // Create and configure the chart
+    // configure chart
     chart->addSeries(lineSeries);
     chart->setTitle("Monthly Spending Trend");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    // Create axes
+    // create axes
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     axisX->append(categories);
     chart->addAxis(axisX, Qt::AlignBottom);
@@ -126,12 +124,11 @@ void AnalyticsPage::updateMonthlyTrend(const QList<QPair<QString, double>> &data
     chart->addAxis(axisY, Qt::AlignLeft);
     lineSeries->attachAxis(axisY);
 
-    // Customize the line
+    // customize line
     lineSeries->setPointsVisible(true);
     lineSeries->setPen(QPen(Qt::blue, 2));
-    lineSeries->setBrush(Qt::NoBrush);
 
-    // Adjust the legend
+    // adjust legend
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 }
@@ -139,24 +136,22 @@ void AnalyticsPage::updateMonthlyTrend(const QList<QPair<QString, double>> &data
 void AnalyticsPage::updateCategoryComparison(const QList<QPair<QString, double>> &data)
 {
     if (!ui->chartView_CategoryComparison || !ui->chartView_CategoryComparison->chart()) {
-        qDebug() << "Category Comparison chart view or chart is not initialized.";
+        qDebug() << "category comparison chart view or chart is not initialized";
         return;
     }
 
     QChart *chart = ui->chartView_CategoryComparison->chart();
 
-    // Clear existing data
+    // clear existing data
     chart->removeAllSeries();
 
-    // Create a new bar series
+    // create new bar series
     QBarSeries *barSeries = new QBarSeries();
     barSeries->setName("Category Expenses");
 
-    // Create a bar set
     QBarSet *barSet = new QBarSet("Expenses");
-
     for (const auto &pair : data) {
-        *barSet << pair.second;
+        *barSet << pair.second; // add values
     }
 
     barSeries->append(barSet);
@@ -164,11 +159,11 @@ void AnalyticsPage::updateCategoryComparison(const QList<QPair<QString, double>>
     chart->setTitle("Category-wise Expense Comparison");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    // Create axes
+    // create axes
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     QStringList categories;
     for (const auto &pair : data) {
-        categories.append(pair.first);
+        categories.append(pair.first); // add category names
     }
     axisX->append(categories);
     chart->addAxis(axisX, Qt::AlignBottom);
@@ -179,10 +174,10 @@ void AnalyticsPage::updateCategoryComparison(const QList<QPair<QString, double>>
     chart->addAxis(axisY, Qt::AlignLeft);
     barSeries->attachAxis(axisY);
 
-    // Customize the bar set
-    barSet->setColor(QColor("#42A5F5")); // Blue color
+    // customize bar colors
+    barSet->setColor(QColor("#42A5F5")); // blue color
 
-    // Adjust the legend
+    // adjust legend
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 }
@@ -190,24 +185,22 @@ void AnalyticsPage::updateCategoryComparison(const QList<QPair<QString, double>>
 void AnalyticsPage::updateTopStores(const QList<QPair<QString, double>> &data)
 {
     if (!ui->chartView_TopStores || !ui->chartView_TopStores->chart()) {
-        qDebug() << "Top Stores chart view or chart is not initialized.";
+        qDebug() << "top stores chart view or chart is not initialized";
         return;
     }
 
     QChart *chart = ui->chartView_TopStores->chart();
 
-    // Clear existing data
+    // clear existing data
     chart->removeAllSeries();
 
-    // Create a new bar series
+    // create new bar series
     QBarSeries *barSeries = new QBarSeries();
     barSeries->setName("Top Stores");
 
-    // Create a bar set
     QBarSet *barSet = new QBarSet("Spending");
-
     for (const auto &pair : data) {
-        *barSet << pair.second;
+        *barSet << pair.second; // add values
     }
 
     barSeries->append(barSet);
@@ -215,11 +208,11 @@ void AnalyticsPage::updateTopStores(const QList<QPair<QString, double>> &data)
     chart->setTitle("Top Stores by Spending");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    // Create axes
+    // create axes
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     QStringList stores;
     for (const auto &pair : data) {
-        stores.append(pair.first);
+        stores.append(pair.first); // add store names
     }
     axisX->append(stores);
     chart->addAxis(axisX, Qt::AlignBottom);
@@ -230,10 +223,10 @@ void AnalyticsPage::updateTopStores(const QList<QPair<QString, double>> &data)
     chart->addAxis(axisY, Qt::AlignLeft);
     barSeries->attachAxis(axisY);
 
-    // Customize the bar set
-    barSet->setColor(QColor("#66BB6A")); // Green color
+    // customize bar colors
+    barSet->setColor(QColor("#66BB6A")); // green color
 
-    // Adjust the legend
+    // adjust legend
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 }
