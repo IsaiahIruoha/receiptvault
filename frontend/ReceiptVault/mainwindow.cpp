@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // use DatabaseManager to open the database
-    if (!DatabaseManager::instance().openDatabase("../../../../../../../backend/db/receiptvault.db")) {
+    if (!DatabaseManager::instance().openDatabase("C:/Users/Lenovo/Documents/GitHub/Elec376_F24_group7/backend/db/receiptvault.db")) {
         QMessageBox::critical(this, "Database Connection Error", "Unable to connect to the database.");
         exit(EXIT_FAILURE);
     }
@@ -314,7 +314,7 @@ void MainWindow::handleUploadReceipt()
         QString output = pythonProcess.readAllStandardOutput();
         QString errorOutput = pythonProcess.readAllStandardError();
 
-        qDebug() << output;
+        qDebug() << output << "Output from Python Script";
 
         // check for Python errors
         if (!errorOutput.isEmpty()) {
@@ -322,6 +322,7 @@ void MainWindow::handleUploadReceipt()
             qDebug() << "Python Error:" << errorOutput;
             return;
         }
+
 
         // parse the JSON output
         QJsonDocument jsonDoc = QJsonDocument::fromJson(output.toUtf8());
@@ -331,20 +332,74 @@ void MainWindow::handleUploadReceipt()
             return;
         }
 
+        qDebug() << "Parsed output to jsonDoc";
+
         QJsonObject jsonObj = jsonDoc.object();
 
+        qDebug() << "Parsed output to jsonObject";
+
         //Parse store from json
-        QString store = jsonObj["store"].toString();
+        QString store = jsonObj["company"].toString();
 
         //parse total as a double from json
         QString totalString = jsonObj["total"].toString();
+
+        qDebug() << "totalString";
         totalString.remove('$');
         double totalAmount = totalString.toDouble();
+        qDebug() << "totalString good";
 
-        //Parse date from json and flip
+        // Parse date from JSON
         QString date = jsonObj["date"].toString();
+        qDebug() << "Original date:" << date;
+
+        // Replace any '/' with '-'
+        date.replace("/", "-");
+
+        qDebug() << "Date with '-': " << date;
+
+        // Validate and format date
         QStringList dateParts = date.split('-');
-        date = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[0];
+        if (dateParts.size() == 3) {
+
+            QString yearPart = dateParts[2];
+
+
+            // Convert two digit year to standard full format
+            if (yearPart.size() == 2) {
+                int year = yearPart.toInt();
+                if (year <= 50) {
+                    yearPart = "20" + QString::number(year);
+                } else {
+                    yearPart = "19" + QString::number(year);
+                }
+                dateParts[2] = yearPart;
+                qDebug() << "Converted two-digit year to four digits:" << yearPart;
+            }
+
+            if (dateParts[0].size() == 2 && dateParts[1].size() == 2 && dateParts[2].size() == 4) {
+                // MM-DD-YYYY or DD-MM-YYYY format
+                if (dateParts[0].toInt() <= 12) {
+                    // Assume it's MM-DD-YYYY and flip to YYYY-MM-DD
+                    date = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1];
+                } else {
+                    // Assume it's DD-MM-YYYY and flip to YYYY-MM-DD
+                    date = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+                }
+                qDebug() << "Formatted date:" << date;
+            } else if (dateParts[0].size() == 4 && dateParts[1].size() == 2 && dateParts[2].size() == 2) {
+                // Already in YYYY-MM-DD format
+                qDebug() << "Date is already in YYYY-MM-DD format.";
+            } else {
+                // Invalid date parts size
+                date = "";
+                qDebug() << "Invalid date format. Resetting to empty string.";
+            }
+        } else {
+            // If dateParts size is not 3 after splitting
+            date = "";
+            qDebug() << "Invalid date format with incorrect separators. Resetting to empty string.";
+        }
 
 
         qDebug() << jsonObj;

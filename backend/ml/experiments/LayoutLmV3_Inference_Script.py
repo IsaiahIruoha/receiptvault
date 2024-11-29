@@ -1,5 +1,9 @@
 # LayoutLmV3 Inference Script
 
+# Based on Receipt Understanding Notebook by IbrahimHabibeg 
+# https://www.kaggle.com/code/ibrahimhabibeg/building-a-receipt-understanding-model
+#
+
 
 
 # ---------------------- libs ----------------------------------
