@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // use DatabaseManager to open the database
-    if (!DatabaseManager::instance().openDatabase("C:/Users/Lenovo/Documents/GitHub/Elec376_F24_group7/backend/db/receiptvault.db")) {
+    if (!DatabaseManager::instance().openDatabase("../../../../../../../backend/db/receiptvault.db")) {
         QMessageBox::critical(this, "Database Connection Error", "Unable to connect to the database.");
         exit(EXIT_FAILURE);
     }
